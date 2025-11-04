@@ -5,26 +5,45 @@
  * Install/update hooks for auction_core.
  */
 
+use Drupal\Core\Database\Database;
+
 /**
  * Implements hook_install().
  */
 function auction_core_install() {
-  // Niks speciaals bij installatie.
-}
+  $schema = \Drupal::database()->schema();
 
-/**
- * Implements hook_uninstall().
- */
-function auction_core_uninstall() {
-  // Opruimen indien ooit nodig.
+  if (!$schema->tableExists('auction_core_lot_ext')) {
+    $schema->createTable('auction_core_lot_ext', [
+      'fields' => [
+        'lot_id' => ['type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE],
+        'ext_seconds' => ['type' => 'int', 'not null' => TRUE, 'default' => 0],
+        'updated' => ['type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE],
+      ],
+      'primary key' => ['lot_id'],
+    ]);
+  }
+
+  if (!$schema->tableExists('auction_core_shift_edges')) {
+    $schema->createTable('auction_core_shift_edges', [
+      'fields' => [
+        'id' => ['type' => 'serial', 'not null' => TRUE],
+        'auction_id' => ['type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE],
+        'seq_from' => ['type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE],
+        'delta_seconds' => ['type' => 'int', 'not null' => TRUE],
+        'created' => ['type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'auction_seq' => ['auction_id', 'seq_from'],
+      ],
+    ]);
+  }
 }
 
 /**
  * Baseline update om schema-versie vast te zetten.
- *
- * Bewust geen DB-wijzigingen. Dit zorgt er alleen voor dat Drupal
- * de module als “gesynchroniseerd” beschouwt en geen warning meer geeft.
  */
 function auction_core_update_8001() {
-  // No-op. Laat bewust leeg.
+  // no-op.
 }

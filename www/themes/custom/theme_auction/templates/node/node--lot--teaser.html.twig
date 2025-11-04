@@ -1,148 +1,131 @@
-{# node--lot--teaser.html.twig #}
-{{ attach_library('theme_auction/material-icons') }}
+{#
+/**
+ * @file
+ * Teaser template voor lot met live soft-close countdown.
+ *
+ * Verwacht in preprocess:
+ * - lot_end_ts (UNIX timestamp, effectieve eindtijd via auction_core.soft_close)
+ * - server_now_ts (UNIX timestamp; voor drift-correctie)
+ * - bidding_form (optioneel: AuctionSubmit form in teaser view_mode)
+ *
+ * Vereiste libraries:
+ * - theme_auction/auction.countdown (JS voor timers + batch polling)
+ *
+ * Let op selectors (compat met jouw AJAX in AuctionSubmit.php):
+ * - #c-lot-counter-{{ node.id }} .highest_bid   (AJAX update hoogste bod)
+ * - #auction-submit-{{ node.id }} .result_message (AJAX feedback)
+ */
+#}
 
-{# ===================== KLASSEN ===================== #}
-{% set classes = [] %}
-{% if logged_in and (node.field_highest_bid_user.target_id ?? 0) == uid %}
-	{% set classes = classes|merge(['highest-bid']) %}
-{% endif %}
-
-{# ===================== TIMESTAMPS (uit preprocess) ===================== #}
-{% set end_ts = lot_end_ts ?? null %}
-{% set server_now = server_now_ts ?? null %}
-
-{# (extra veilig) countdown-library aanhaken #}
+{{ attach_library('classy/node') }}
 {{ attach_library('theme_auction/auction.countdown') }}
 
-<article{{attributes.addClass(classes)}} id="node-{{ node.id }}">
-	<div
-		class="c-lot-teaser">
+{# Handige classes (pas aan naar je eigen BEM als je wilt) #}
+{% set classes = [
+  'node',
+  'node--type-lot',
+  'node--view-mode-teaser',
+  logged_in ? 'is-logged-in',
+] %}
 
-		{# ===================== BOVENSTE BLOK ===================== #}
-		<div class="c-lot-teaser__info-top">
-			<div class="c-lot-teaser__cover">
-				<a href="{{ path('entity.node.canonical', {'node': node.id}) }}">
-					{{ content.field_cover }}
-				</a>
+<article{{attributes.addClass(classes)}}>
+	<header class="c-lot-teaser__header">
+		<h3 class="c-lot-title">
+			<a href="{{ url }}">{{ label }}</a>
+		</h3>
+
+		{# Optioneel: lotnummer tonen als veld #}
+		{% if content.field_lot_nr is defined %}
+			<div class="c-lot-number">
+				{{ 'Lot'|t }}
+				{{ content.field_lot_nr }}
 			</div>
+		{% endif %}
+	</header>
 
-			<div class="c-lot-teaser__info">
-				<h3 class="c-lot-name">
-					<a href="{{ path('entity.node.canonical', {'node': node.id}) }}">
-						{{ label }}
-						{% if node.field_btw_verschuldigd.value is not empty and node.field_btw_verschuldigd.value == '1' %}
-							–
-							{{ 'VAT lot'|t }}
-						{% endif %}
-					</a>
-				</h3>
+	{# Afbeelding / media (optioneel) #}
+	{% if content.field_image is defined %}
+		<div class="c-lot-media">
+			{{ content.field_image }}
+		</div>
+	{% endif %}
 
-				<div class="c-lot-meta">
-					{{ content.field_appellation }}
-					{{ content.field_bottler }}
-				</div>
+	{# Korte beschrijving (optioneel) #}
+	{% if content.body is defined %}
+		<div class="c-lot-summary">
+			{{ content.body }}
+		</div>
+	{% endif %}
 
-				<div class="c-lot-content">
-					{{ content.field_p_lot_content }}
-				</div>
-			</div>
-
-			{% if logged_in %}
-				<div class="c-lot-favorite">
-					{{ content.flag_flag_favorite }}
-				</div>
-			{% endif %}
+	{# Einde-label met live aanpasbare tijd (js-endtime) #}
+	{% if lot_end_ts is defined and server_now_ts is defined %}
+		<div class="c-lot-teaser__enddate">
+			<span class="end-label">
+				{{ 'Bieden op dit lot eindigt op'|t }}
+				{{ lot_end_ts|format_date('custom', 'd/m') }}
+				{{ 'om'|t }}
+				<span class="js-endtime">{{ lot_end_ts|format_date('custom', 'H:i:s') }}</span>
+			</span>
 		</div>
 
-		{# ===================== MIDDENBLOK: countdown ===================== #}
-		<div class="c-lot-teaser__info-middle">
-			{% if end_ts and server_now < end_ts %}
-				<div class="c-lot-counter-wrapper">
-					<div class="c-lot-teaser__enddate">
-						<span class="end-label">
-							{{ 'Bieden op dit lot eindigt op'|t }}
-							{{ end_ts|format_date('custom', 'd/m') }}
-							{{ 'om'|t }}
-							{{ end_ts|format_date('custom', 'H:i:s') }}
-						</span>
-					</div>
+		{# Countdown container met data-attributen #}
+		<div class="c-lot-counter c-lot-timer" id="c-lot-counter-{{ node.id }}" data-lot-id="{{ node.id }}" data-end-ts="{{ lot_end_ts }}" data-server-now="{{ server_now_ts }}">
+			<span class="js-countdown" aria-live="polite">
+				{{ lot_end_ts|format_date('custom','H:i:s') }}
+			</span>
 
-					<div class="c-lot-counter c-lot-timer" data-end-ts="{{ end_ts }}" data-server-now="{{ server_now }}">
-						<span class="js-countdown" aria-live="polite">
-							{{ end_ts|format_date('custom', 'H:i:s') }}
-						</span>
-						<noscript>{{ end_ts|format_date('custom', 'H:i:s') }}</noscript>
-					</div>
-				</div>
-			{% else %}
-				<div class="c-lot-timer-closed">
-					<span>{{ 'Dit lot is afgesloten'|t }}</span>
-				</div>
-			{% endif %}
-		</div>
-
-		{# ===================== ONDERBLOK: schatting / bod / formulier ===================== #}
-		<div class="c-lot-teaser__info-bottom">
-
-			{% if end_ts and server_now < end_ts %}
-				{# ----- LOT IS OPEN ----- #}
-				<h4 class="c-lot-teaser__subtitle">{{ 'Schatting'|t }}</h4>
-				{{ content.field_minimum_estimate }}
-
-				{% if logged_in %}
-					<h4 class="c-lot-teaser__subtitle">{{ 'Huidig bod'|t }}</h4>
-					{% if node.field_highest_bid.value is not empty %}
-						<span class="highest_bid">€
-							{{ content.field_highest_bid }}</span>
+			{# Huidige/hoogste bod (AJAX update schrijft hier naar .highest_bid) #}
+			<div class="c-lot-highest">
+				<span class="label">{{ 'Huidig bod:'|t }}</span>
+				<span
+					class="highest_bid">
+					{# Toon voorkeur: variabele highest_offer, anders veldwaarde #}
+					{% if highest_offer is defined and highest_offer %}
+						{{ highest_offer }}
+					{% elseif content.field_highest_bid is defined %}
+						{{ content.field_highest_bid }}
 					{% else %}
-						<span class="highest_bid">{{ 'Nog geen biedingen'|t }}</span>
+						—
 					{% endif %}
-
-					<div class="c-lot-bid">
-						{% if bidding_form is defined and bidding_form %}
-							{{ bidding_form }}
-						{% elseif bidding_link is defined and bidding_link %}
-							{{ bidding_link }}
-						{% else %}
-							<em>{{ 'Biedformulier is niet beschikbaar.'|t }}</em>
-						{% endif %}
-
-						{# --- Koperscommissie --- #}
-						{% set btw_val = node.field_btw_verschuldigd.value|default('0') %}
-						{% if btw_val == '0' %}
-							<div class="c-lot-cost">
-								<i>{{ 'De koperscommissie bedraagt 17% bovenop de hamerprijs.'|t }}</i>
-							</div>
-						{% elseif btw_val == '1' %}
-							<div class="c-lot-cost">
-								<i>{{ 'De koperscommissie bedraagt 14,05% bovenop de hamerprijs.'|t }}</i>
-							</div>
-						{% endif %}
-					</div>
-
-					{% if node.field_highest_bid_user.target_id == uid %}
-						<div class="highest_bidder">
-							{{ 'Je hebt momenteel het hoogste bod'|t }}
-						</div>
-					{% endif %}
-				{% else %}
-					<div class="login-message">
-						{{ 'Inloggen om te bieden'|t }}
-					</div>
-				{% endif %}
-
-			{% else %}
-				{# ----- LOT IS GESLOTEN ----- #}
-				<h4 class="c-lot-teaser__subtitle">{{ 'Resultaat'|t }}</h4>
-				{% if node.field_highest_bid.value is not empty %}
-					<span class="highest_bid">€
-						{{ content.field_highest_bid }}</span>
-				{% else %}
-					<span class="highest_bid">{{ 'Geen biedingen'|t }}</span>
-				{% endif %}
-			{% endif %}
-
+				</span>
+			</div>
 		</div>
+	{% else %}
+		{# Fallback als preprocess nog geen lot_end_ts meegaf #}
+		<div class="c-lot-counter c-lot-timer">
+			<span class="countdown-finished">{{ 'Tijd onbekend'|t }}</span>
+		</div>
+	{% endif %}
 
+	{# Biedformulier (AJAX). We plaatsen een wrapper met id waar jouw Ajax naar target. #}
+	<div class="c-lot-bod-wrapper c-lot-bid" id="auction-submit-{{ node.id }}">
+		{% if bidding_form is defined and bidding_form %}
+			{{ bidding_form }}
+		{% else %}
+			{# Optioneel: link naar biedpagina/aanmelden #}
+			{% if bidding_link is defined and bidding_link %}
+				<div class="c-lot-bid-cta">
+					{{ bidding_link }}
+				</div>
+			{% endif %}
+		{% endif %}
 	</div>
+
+	{# Extra velden die je wél in teaser wil tonen #}
+	<div class="c-lot-meta">
+		{% if content.field_minimum_offer is defined %}
+			<div class="c-lot-min-offer">
+				<span class="label">{{ 'Openingsbod:'|t }}</span>
+				{{ content.field_minimum_offer }}
+			</div>
+		{% endif %}
+
+		{# voorbeeld: aankoper / categorieën, pas aan naar eigen velden #}
+		{% if content.field_category is defined %}
+			<div class="c-lot-category">
+				{{ content.field_category }}
+			</div>
+		{% endif %}
+	</div>
+
 </article>

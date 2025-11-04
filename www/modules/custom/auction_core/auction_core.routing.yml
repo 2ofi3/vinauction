@@ -1,0 +1,19 @@
+auction_core.lot_end:
+  path: '/auction-core/lot/{lot}/end'
+  defaults:
+    _controller: '\Drupal\auction_core\Controller\AuctionStatusController::lotEnd'
+  requirements:
+    _permission: 'access content'
+    lot: '\d+'
+  options:
+    _format: 'json'
+
+auction_core.auction_ends:
+  path: '/auction-core/auction/{auction}/ends'
+  defaults:
+    _controller: '\Drupal\auction_core\Controller\AuctionStatusController::auctionEnds'
+  requirements:
+    _permission: 'access content'
+    auction: '\d+'
+  options:
+    _format: 'json'
