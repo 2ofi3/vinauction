@@ -1,0 +1,28 @@
+ddev:
+  root: /var/www/html/www
+  uri: https://auction.ddev.site/
+
+prod:
+  root: /data/sites/web/vinauction/checkout/master/current
+  uri: https://vin.auction
+  host: ID210976_production.db.webhosting.be
+  user: ID210976_production
+  ssh:
+    options: '-p 222'
+    tty: false
+  paths:
+    drush-script: /data/sites/web/vinauction/checkout/master/vendor/drush/drush
+    files: /data/sites/web/vinauction/checkout/master/shared/www/sites/default/files
+
+dev:
+  root: /data/sites/web/vinauction/checkout/develop/current
+  uri: https://vin.auction
+  host: ID210976_develop.db.webhosting.be
+  user: ID210976_develop
+  ssh:
+    options: '-p 222'
+    tty: false
+  paths:
+    drush-script: /data/sites/web/vinauction/checkout/develop/vendor/drush/drush
+    files: /data/sites/web/vinauction/checkout/develop/shared/www/sites/default/files
+

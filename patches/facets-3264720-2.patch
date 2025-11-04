@@ -1,0 +1,13 @@
+diff --git a/modules/facets_searchbox_widget/js/searchbox.js b/modules/facets_searchbox_widget/js/searchbox.js
+index 2757c33..ebefc5c 100644
+--- a/modules/facets_searchbox_widget/js/searchbox.js
++++ b/modules/facets_searchbox_widget/js/searchbox.js
+@@ -37,7 +37,7 @@
+       function search(filter, display, $targetList) {
+         let value = $(this).find('.facet-item__value').html();
+ 
+-        if (value.toUpperCase().indexOf(filter) === 0) {
++        if (value.toUpperCase().indexOf(filter) >= 0) {
+           if (!$(this).hasClass('hide-if-no-result')) {
+             $(this).css('display', display);
+           }

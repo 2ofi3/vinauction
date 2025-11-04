@@ -1,0 +1,9 @@
+name: Auction Core
+type: module
+description: Core services (offers, timeline, bid link) and form alters for the auction.
+core_version_requirement: ^9 || ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:node
+  - drupal:user
+  - drupal:webform

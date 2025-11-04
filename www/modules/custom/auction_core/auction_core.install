@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ * Install/update hooks for auction_core.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function auction_core_install() {
+  // Niks speciaals bij installatie.
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function auction_core_uninstall() {
+  // Opruimen indien ooit nodig.
+}
+
+/**
+ * Baseline update om schema-versie vast te zetten.
+ *
+ * Bewust geen DB-wijzigingen. Dit zorgt er alleen voor dat Drupal
+ * de module als “gesynchroniseerd” beschouwt en geen warning meer geeft.
+ */
+function auction_core_update_8001() {
+  // No-op. Laat bewust leeg.
+}

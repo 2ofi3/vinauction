@@ -1,0 +1,137 @@
+body.eu-cookie-compliance-popup-open {
+  overflow: hidden;
+  max-height: 100vh;
+}
+// MODAL COOCKIES
+.c-modal__cookies {
+  z-index: 140;
+  text-align: left;
+}
+
+.c-modal__cookielist {
+  display: flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.c-modal__cookielist:not(:firt-child) {
+  margin-top: 1.5rem;
+}
+
+.c-modal__cookielabel {
+  margin-right: 1rem !important;
+  margin-bottom: .5rem;
+  padding: 0 !important;
+  flex-shrink: 0;
+}
+
+.c-modal__cookielist-icon:before {
+  text-decoration: none;
+  color: #2d89cc
+}
+
+.c-modal__cookielist-icon:before:focus {
+  text-decoration: none
+}
+
+.c-modal__cookielist-icon:before:visited {
+  color: #2d89cc
+}
+
+.c-modal__cookielist-icon:before:hover {
+  text-decoration: none
+}
+
+.c-modal__cookie-overlay {
+  position: fixed;
+  z-index: 135;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(47, 47, 47, .5)
+}
+
+.o-modal-open {
+  overflow: hidden;
+  height: 100vh
+}
+
+.c-image-container, .c-modal__cookielist {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex
+}
+
+#eu-cookie-compliance-categories .u-text-meta {
+  font-size: 14px;
+  line-height: 16px;
+}
+
+#cookies .o-btn-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 2rem 0;
+}
+
+.u-text-meta {
+  color: #9097a0;
+}
+
+@media (max-width: 42.5em) {
+  .c-modal.-bottom-drawer\@tablet {
+    top: unset;
+    bottom: 0;
+    left: 0;
+    overflow: auto;
+    transform: unset
+  }
+
+  .c-modal.-large, .c-modal.-medium {
+    max-width: 100vw;
+    max-height: 90vh
+  }
+
+  .c-modal__split-body.-left {
+    width: 100%;
+    padding: 1rem
+  }
+
+  .c-modal__split-body.-right {
+    display: none
+  }
+
+  .c-modal__cookielist {
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    position: relative;
+    padding-right: 1rem
+  }
+
+  .c-modal__cookielist.is-open {
+    border-right: 1px solid #48006a
+  }
+
+  .c-modal__cookielabel {
+    width: auto;
+    flex-shrink: unset
+  }
+
+  .c-modal__cookielist-icon {
+    position: absolute;
+    top: -12px;
+    right: 0;
+    padding: 11px;
+    transform: translateX(50%);
+    text-decoration: none;
+    background: #fff
+  }
+}
+
+

@@ -1,0 +1,50 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function auction_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Fix action voor exposed views form in block context (was in theme).
+  if (!empty($form['#id']) && $form['#id'] === 'views-exposed-form-veiling-auction') {
+    $form['#action'] = \Drupal::service('path.current')->getPath();
+  }
+
+  // Webform 'offer': extra context en validate callback.
+  if (!empty($form['#webform_id']) && $form['#webform_id'] === 'offer' && !empty($form['elements']['lot_select']['#default_value'])) {
+    $form['actions']['submit']['#validate'][] = 'auction_core_offer_validate';
+  }
+}
+
+/**
+ * Validate: minimum, highest en stap via service.
+ */
+function auction_core_offer_validate(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\auction_core\Service\Offers $offers */
+  $offers = \Drupal::service('auction_core.offers');
+
+  $bod = (float) $form_state->getValue('bod');
+  $lot = (int) $form_state->getValue('lot_select');
+
+  $highest = $offers->getHighestForLot($lot);
+  $start   = $offers->getStartingBidForLot($lot);
+  $step    = $offers->getStepForStart($start);
+
+  $min = max($highest, $start) + $step;
+
+  if ($bod <= $highest) {
+    $form_state->setErrorByName('bod', t('U dient hoger te bieden dan @highest', ['@highest' => $highest]));
+    return;
+  }
+  if ($bod < $start) {
+    $form_state->setErrorByName('bod', t('U dient hoger te bieden dan @start', ['@start' => $start]));
+    return;
+  }
+  if ($bod < $min) {
+    $form_state->setErrorByName('bod', t('U dient hoger te bieden dan @min', ['@min' => $min]));
+    return;
+  }
+
+  // TODO: enqueue mail naar lagere bieders (niet hier, niet sync).
+}

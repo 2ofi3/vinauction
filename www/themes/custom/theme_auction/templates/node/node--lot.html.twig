@@ -1,0 +1,154 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+
+{% set classes = [
+  'c-node',
+] %}
+{{ attach_library('classy/node') }}
+{% set now = "now"|date("Y/m/d H:i:s e") %}
+{% set endlot = content.field_einddatum|render|striptags|date('Y/m/d H:i:s') %}
+{% set enddate = content.field_einddatum|render|striptags|date('d/m') %}
+{% set endtime = content.field_einddatum|render|striptags|date('H:i:s') %}
+{% set auctionLink = content.field_auction_reference['#items'][0].target_id %}
+
+<article{{attributes.addClass(classes)}}>
+	<a class="lot__title__back" href="javascript:history.go(-1)">{{ 'Back to auction'|t }}
+		{{ content.field_auction_reference[0]['#node'].title.value }}</a>
+	<div class="c-node__inner">
+		<div class="c-lot">
+			<div class="o-grid">
+				<div class="o-grid__item u-1/1 u-4/12@tablet">
+					{{ content.field_cover }}
+					{{ content.field_images }}
+				</div>
+				<div class="o-grid__item u-1/1 u-5/12@tablet">
+					<div class="c-lot__detail">
+						<h1 class="c-lot__title">
+							{{ label }}
+							{% if '1' in content.field_btw_verschuldigd[0] %}
+								-
+								{{ 'VAT lot'|t }}
+							{% endif %}
+						</h1>
+						<div class="c-lot__baseline">{{ content.field_auction_reference[0]['#node'].title.value }}</div>
+						<div class="c-lot__meta">
+							{{ content.field_appellation }}
+							{{ content.field_bottler }}
+						</div>
+						{% if logged_in %}
+							{{ content.flag_flag_favorite }}
+						{% endif %}
+						{% if now < endlot %}
+							<div class="c-lot-counter-wrapper">
+								<div class="c-lot-timer-closed js-disabled">
+									<span>{{ 'Dit lot is afgesloten'|t }}</span>
+								</div>
+								<div class="c-lot-teaser__enddate">
+									<span>{{ 'Bieden op dit lot eindigt op'|t }}
+										{{ enddate }}
+										{{ 'om'|t }}
+										{{ endtime }}</span>
+								</div>
+								<div class="c-lot-counter c-lot-timer" data-countdown="{{ content.field_einddatum|render|striptags|trim|lower }}"></div>
+							</div>
+						{% else %}
+							<div class="c-lot-timer-closed">
+								<span>{{ 'Dit lot is afgesloten'|t }}</span>
+							</div>
+						{% endif %}
+						<div class="c-lot__block">
+							<h2>{{ 'Content'|t }}</h2>
+							{{ content.field_p_lot_content }}
+						</div>
+						<div class="c-lot__block">
+
+							{% if now < endlot %}
+              <h4 class="c-lot-teaser__subtitle">{{ 'Schatting'|t }}</h4>
+							{{ content.field_minimum_estimate }}
+							- Up
+								{% if logged_in %}
+									<div class="c-lot-bod-wrapper">
+										<h4 class="c-lot-teaser__subtitle">{{ 'Bid'|t }}</h4>
+										{% if node.field_highest_bid.value is not empty %}
+											{{ 'Leading bid'|t }}: €
+											<span class="highest_bid">{{ content.field_highest_bid }}</span>
+										{% else %}
+											<span class="highest_bid">{{ 'No bids'|t }}</span>
+										{% endif %}
+										{{ bidding_form }}
+									</div>
+									{% if '0' in content.field_btw_verschuldigd[0] %}
+										<div class="c-lot-cost">
+											<i>{{ 'De koperscommissie bedraagt 17% bovenop de hamerprijs.'|t }}</i>
+										</div>
+									{% endif %}
+									{% if '1' in content.field_btw_verschuldigd[0] %}
+										<div class="c-lot-cost">
+											<i>{{ 'De koperscommissie bedraagt 14,05% bovenop de hamerprijs.'|t }}</i>
+										</div>
+									{% endif %}
+								{% else %}
+									<span class="login-message">{{ 'Inloggen om te bieden'|t }}</span>
+								{% endif %}
+							{% else %}
+								<h4 class="c-lot-teaser__subtitle">{{ 'Resultaat'|t }}</h4>
+								{% if node.field_highest_bid.value is not empty %}
+									<span class="highest_bid">€
+										{{ content.field_highest_bid }}</span>
+								{% else %}
+									<span class="highest_bid">{{ 'Geen biedingen'|t }}</span>
+								{% endif %}
+							{% endif %}
+							{% if '1' in content.field_btw_verschuldigd[0] %}
+								<div class="c-vat-text">
+									<i>
+										{{ "VAT must be paid on a lot subject to VAT on the hammer price and separately on the buyer's commission.
+                  The VAT is a percentage that differs per Member State in the EU. For Belgium it is 21%. </br></br>
+                  <a href='https://europa.eu/youreurope/business/taxation/vat/vat-rules-rates/index_en.htm' target='_blank'>Shipments / deliveries within the EU are subject to tax.</a></br></br>
+                  <ul>
+                  <li>
+                  Business buyers ( with  can reclaim the payment of VAT in Belgium and for shipments to destinations outside Belgium there is a deferral (reverse charge) of payment. </br>
+                  </li>
+                  <li>
+                   <a href='https://europa.eu/youreurope/business/taxation/vat/vat-rules-rates/index_en.htm' target='_blank'>Private buyers pay the VAT of the destination country ( consult here the VAT percentage / country ) </a></li>
+                  </ul>
+                  Lots subject to VAT are completely free of VAT for shipments outside the EU / to a bonded warehouse ( when Vin.auction receives the legitimate proof of export ) </br>
+                  <h5>Example</h5> </br>
+                  If the buyer's commission ex VAT is 14,88% over the hammer price, and the VAT would be 21%,  the calculation is as follows: </br>
+                  At a hammer price of 100€ the total amount will be 100 + 14,88% buyer’s commission + 21% VAT over the summary hammerprice: 138€
+                  "|t }}</i>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="o-grid__item u-1/1 u-3/12@tablet">
+					<div class="c-cta c-cta-lot">
+						<h2>{{ 'Vragen over dit lot'|t }}</h2>
+						<div class="c-cta__text">
+							{{ 'Zit je met een vraag? Dat begrijpen wij helemaal. Onze experts beantwoorden al uw vragen.'|t }}
+						</div>
+						{% if language_using == 'nl' %}
+							<a href="/nl/node/29?lot_select={{ node.id() }}&subject={{ node.label() }}" class="c-button">{{ 'Stel u vraag'|t }}</a>
+						{% endif %}
+						{% if language_using == 'fr' %}
+							<a href="/fr/node/29?lot_select={{ node.id() }}&subject={{ node.label() }}" class="c-button">{{ 'Stel u vraag'|t }}</a>
+						{% endif %}
+						{% if language_using == 'en' %}
+							<a href="/en/node/29?lot_select={{ node.id() }}&subject={{ node.label() }}" class="c-button">{{ 'Stel u vraag'|t }}</a>
+						{% endif %}
+					</div>
+
+					{#{{ drupal_entity('block', 'ctaverkoopuwwijnen', check_access=false) }}#}
+
+				</div>
+			</div>
+		</div>
+	</div>
+</article>

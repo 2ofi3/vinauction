@@ -1,0 +1,57 @@
+// sass-lint:disable-all
+$show-breakpoint-label: false;
+
+$break-1: 460px;
+$break-2: 768px;
+$break-3: 1024px;
+$break-4: 1400px;
+
+@include inuit-widths(12);
+
+@media screen and (min-width: 768px) {
+  @include inuit-widths(12, \@tablet);
+}
+
+@media screen and (min-width: 1024px) {
+  @include inuit-widths(12, \@laptop);
+}
+
+@media screen and (min-width: 1400px) {
+  @include inuit-widths(12, \@desktop);
+}
+
+@if $show-breakpoint-label {
+  body::after {
+    @include rem(font-size, 1.3rem);
+    content: 'default';
+    display: block;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 5px 10px;
+    color: white;
+    background: red;
+    height: auto;
+    font-weight: 600;
+  }
+
+
+  @include mq($from: tablet) {
+    body::after {
+      content: 'break 2 / 42.5em / 680px';
+      background: green;
+    }
+  }
+  @include mq($from: laptop) {
+    body::after {
+      content: 'break 3 / 60em / 960px';
+      background: teal;
+    }
+  }
+  @include mq($from: desktop) {
+    body::after {
+      content: 'break 4 / 72em / 1152px';
+      background: purple;
+    }
+  }
+}

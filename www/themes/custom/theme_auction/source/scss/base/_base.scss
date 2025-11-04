@@ -1,0 +1,114 @@
+html {
+  font-size: 62.5% !important;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  @include rem(font-size, 1.6rem);
+  @include rem(line-height, 2.2rem);
+  -webkit-tap-highlight-color: var(--brand-color);
+  -webkit-text-size-adjust: 100%;
+  color: $black-color;
+  font-weight: 300;
+  font-style: normal;
+  font-family: $base-font-family;
+}
+
+a {
+  color: var(--brand-color);
+  text-decoration: none;
+  &:hover{
+  color: darken($brand-color, 20%) ;
+  }
+}
+
+input,
+button,
+select {
+  font-family: $base-font-family;
+}
+
+a.back-auction {
+  background: var(--brand-color);
+  @include rem(padding, 1rem 2rem);
+  color: white;
+  float: right;
+}
+
+h1, h2, h3 {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  -o-hyphens: auto;
+  hyphens: auto;
+  -webkit-hyphenate-character: "-";
+  -moz-hyphenate-character: "-";
+  -ms-hyphenate-character: "-";
+  -o-hyphenate-character: "-";
+  hyphenate-character: "-";
+  -ms-word-break: normal;
+  word-break: normal;
+  word-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @include rem(margin, 4rem 0 2rem 0);
+  font-weight: 400;
+  font-style: normal;
+  font-family: $base-title-family;
+}
+
+h1 {
+  @include rem(margin-bottom, 1.8rem);
+  @include rem(line-height, 4.7rem);
+  font-weight: 600;
+  text-transform: uppercase !important;
+  font-size: 2.5rem !important;
+}
+
+
+h2 {
+  @include rem(margin-bottom, 1.8rem);
+  @include rem(line-height, 4.7rem);
+  font-size: 2.3rem !important;
+  text-transform: uppercase;
+}
+
+h3 {
+  @include rem(margin-bottom, 1.8rem);
+  @include rem(line-height, 4.2rem);
+  color: $color-primary-2;
+  font-size: 2rem !important;
+  text-transform: uppercase;
+}
+
+h4 {
+  font-size: 1.4rem !important;
+  @include rem(line-height, 3.7rem);
+  color: $color-primary-2;
+}
+
+h5 {
+  //@include rem(margin-bottom, 1.8rem);
+  @include rem(line-height, 3.5rem);
+  color: $color-primary-2;
+  font-size: 1.3rem !important;
+}
+
+h6 {
+  @include rem(margin-bottom, 1.8rem);
+  @include rem(line-height, 2.8rem);
+  color: $color-primary-1;
+  font-size: 1.3rem !important;
+}
+
+sup {
+  @include rem(font-size, 1.4rem);
+  vertical-align: super;
+}
+
+strong,
+b {
+  font-weight: 400;
+}

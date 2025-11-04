@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+{%
+set classes = [
+  'c-node',
+]
+%}
+{{ attach_library('classy/node') }}
+
+<article{{ attributes.addClass(classes) }}>
+  <div class="c-node__inner">
+    <div class="o-grid">
+      <div class="o-grid__item u-1/1 u-1/2@desktop">
+        {{ content.body }}
+      </div>
+      <div class="o-grid__item u-1/1 u-1/2@desktop">
+        {{ content.field_home_image }}
+      </div>
+    </div>
+  </div>
+</article>

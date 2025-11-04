@@ -1,0 +1,164 @@
+<?php
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * @file
+ * Theme helpers for theme_auction.
+ */
+
+/**
+ * Implements hook_preprocess().
+ */
+function theme_auction_preprocess(array &$variables, $hook) {
+  $variables['base_path'] = base_path();
+  $request = \Drupal::request();
+  $variables['host'] = $request->getSchemeAndHttpHost() . '/';
+
+  // Output varieert op interface-taal.
+  $variables['#cache']['contexts'][] = 'languages:language_interface';
+}
+
+/**
+ * Unset width/height op specifieke image styles (presentatie-only).
+ */
+function theme_auction_preprocess_image(array &$variables) {
+  if (!isset($variables['style_name'])) {
+    return;
+  }
+  $styles = ['default', 'gallery', 'auction', 'cover'];
+  if (in_array($variables['style_name'], $styles, TRUE)) {
+    unset($variables['attributes']['width'], $variables['attributes']['height']);
+  }
+}
+
+/**
+ * Implements hook_preprocess_node().
+ *
+ * - Leest datetime uit DB (UTC storage), zet om naar site-TZ (config) en geeft UNIX timestamps door.
+ * - Countdown library wordt gericht attached.
+ * - Biedformulier wordt (tijdelijk) vanuit het theme gezet tot module/blocks klaar zijn.
+ */
+function theme_auction_preprocess_node(array &$variables) {
+  /** @var \Drupal\node\NodeInterface|null $node */
+  $node = $variables['node'] ?? NULL;
+  if (!$node instanceof NodeInterface) {
+    return;
+  }
+
+  $type = $node->bundle();
+  $variables['uid'] = \Drupal::currentUser()->id();
+  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $variables['language_using'] = $language;
+
+  // Cacheability: varieer op user/taal en invalideer op betrokken node.
+  $variables['#cache']['contexts'][] = 'user';
+  $variables['#cache']['contexts'][] = 'languages:language_interface';
+  $variables['#cache']['tags'] = array_merge($variables['#cache']['tags'] ?? [], $node->getCacheTags());
+
+  // 1) Auction teaser: custom path.
+  if ($type === 'veiling' && ($variables['view_mode'] ?? '') === 'teaser') {
+    $variables['auction_path'] = '/' . $language . '/auction/' . $node->id();
+    return;
+  }
+
+  // 2) Loten: countdown + (compat) biedformulier.
+  if ($type === 'lot' && ($variables['view_mode'] ?? '') !== 'searchresults') {
+    // a) Eindtijd: neem de storage (UTC) waarde uit het lot.
+    $end_raw = $node->get('field_einddatum')->value ?: NULL;
+
+    // ALTERNATIEF (indien je per lot vanaf veiling wil rekenen i.p.v. veld op lot):
+    // $auction = $node->get('field_auction_reference')->entity ?? NULL;
+    // if ($auction && !$auction->get('field_einddatum')->isEmpty()) {
+    //   $end_raw = $auction->get('field_einddatum')->value;
+    //   $seq = (int) ($node->get('field_lot_nr')->value ?? 0); // offset in minuten/seconden
+    // }
+
+    if ($end_raw) {
+      // 1) Parse storage (UTC).
+      $end_dt = new DrupalDateTime($end_raw, new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
+
+      // 2) (Optioneel) offset per lot als je met veiling+offset werkt.
+      // if (!empty($seq)) {
+      //   $end_dt->modify('+' . $seq . ' minutes'); // of 'seconds' indien gewenst
+      // }
+
+      // 3) Zet om naar site-timezone (config) of fallback naar Europe/Brussels.
+      $tz = \Drupal::config('system.date')->get('timezone.default') ?: 'Europe/Brussels';
+      $end_dt->setTimezone(new \DateTimeZone($tz));
+
+      // 4) UNIX timestamps naar Twig/JS.
+      $end_ts = $end_dt->getTimestamp();
+      $now    = \Drupal::time()->getRequestTime();
+
+      $variables['lot_end_ts']    = $end_ts;
+      $variables['server_now_ts'] = $now;
+
+      // Attach countdown settings + script.
+      $variables['#attached']['drupalSettings']['themeAuction']['countdown'][$node->id()] = [
+        'lotId'     => $node->id(),
+        'lotEnd'    => $end_ts,
+        'serverNow' => $now,
+      ];
+      $variables['#attached']['library'][] = 'theme_auction/auction.countdown';
+    }
+
+    // b) (Tijdelijk) biedformulier in theme (alleen als user ingelogd én lot open).
+    if (\Drupal::currentUser()->isAuthenticated()
+      && \Drupal::moduleHandler()->moduleExists('auction_bid')
+      && !empty($variables['lot_end_ts'])
+      && !empty($variables['server_now_ts'])
+      && $variables['server_now_ts'] < $variables['lot_end_ts']) {
+
+      /** @var \Drupal\auction_bid\Form\AuctionSubmit $form_object */
+      $form_object = \Drupal::classResolver()->getInstanceFromDefinition('Drupal\auction_bid\Form\AuctionSubmit');
+
+      // Properties zoals eerder gebruikt.
+      $form_object->lot_id = $node->id();
+      $form_object->lot_title = $node->label();
+      $form_object->auction_id = $node->get('field_auction_reference')->target_id ?? NULL;
+      $form_object->starting_bid = $node->get('field_minimum_offer')->value ?? NULL;
+      $form_object->highest_bid = $node->get('field_highest_bid')->value ?? NULL;
+
+      $variables['bidding_form'] = \Drupal::formBuilder()->getForm($form_object);
+      // Form is user-specifiek; user-context is al toegevoegd.
+    }
+
+    // c) Bied-link via service (fallback), als geen formulier.
+    if (empty($variables['bidding_form']) && \Drupal::hasService('auction_core.bid_link')) {
+      /** @var \Drupal\auction_core\Service\BidLinkBuilder $bidLink */
+      $bidLink = \Drupal::service('auction_core.bid_link');
+      $auction_ref = $node->get('field_auction_reference')->target_id ?? NULL;
+      if ($auction_ref) {
+        $variables['bidding_link'] = $bidLink->build($node->id(), $auction_ref);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ *
+ * Licht houden; zware data via controllers/blocks laten komen.
+ */
+function theme_auction_preprocess_page(array &$variables) {
+  // Footer-menu block renderen als presentatie.
+  $block = \Drupal\block\Entity\Block::load('theme_auction_footer');
+  if ($block) {
+    $variables['footer_menu'] = \Drupal::entityTypeManager()->getViewBuilder('block')->view($block);
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view().
+ *
+ * Presentatie van search-block in view.
+ */
+function theme_auction_preprocess_views_view(array &$variables) {
+  $block = \Drupal\block\Entity\Block::load('search');
+  if ($block) {
+    $variables['search_block'] = \Drupal::entityTypeManager()->getViewBuilder('block')->view($block);
+  }
+}

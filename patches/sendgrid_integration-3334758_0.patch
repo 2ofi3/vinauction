@@ -1,0 +1,669 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 893181b..7a9134f 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -9,16 +9,16 @@ upgrade scripts but is documented here.
+ 
+ Background
+ --------------------------------------------------------------------------------
+-Guzzle was introduced into the Sendgrid library in May 2015; however, to 
+-maintain compatibility with PHP 5.3 Sendgrid choose to use a sunsetted version 
+-of Guzzle (3.x). The current active version of Guzzle is 6.x which adheres to 
++Guzzle was introduced into the Sendgrid library in May 2015; however, to
++maintain compatibility with PHP 5.3 Sendgrid choose to use a sunsetted version
++of Guzzle (3.x). The current active version of Guzzle is 6.x which adheres to
+ PSR specifications but also requires PHP 5.4. Drupal 8 ships with Guzzle 6.x in
+-core giving a great upgrade path for any module using web services. I forked 
+-the Sendgrid PHP library and upgraded it to Guzzle 6.x and Alpha 3 uses this 
+-forked version that is published in Packagist. The reason I did this was after 
+-a discusion with the Sendgrid developers, this was the best path forward since 
+-they had no interest at the moment of maintaining a second version of their 
+-library. I will continue to maintain the fork till Sendgrid takes on the code to 
++core giving a great upgrade path for any module using web services. I forked
++the Sendgrid PHP library and upgraded it to Guzzle 6.x and Alpha 3 uses this
++forked version that is published in Packagist. The reason I did this was after
++a discusion with the Sendgrid developers, this was the best path forward since
++they had no interest at the moment of maintaining a second version of their
++library. I will continue to maintain the fork till Sendgrid takes on the code to
+ upgrade to Guzzle 6.x sometime in the unknown future.
+ 
+ Major changes
+@@ -48,5 +48,5 @@ Option 2:
+ 1. Install dependencies for module before attempting to upgrade module.
+ 2. Download module and replace existing Sendgrid Integration Module.
+ 3. Run update.
+-4. Configure new settings in admin page for the module. 
+-   (admin/config/services/sendgrid)
+\ No newline at end of file
++4. Configure new settings in admin page for the module.
++   (admin/config/services/sendgrid)
+diff --git a/README.md b/README.md
+index b949d75..ac0a2d2 100644
+--- a/README.md
++++ b/README.md
+@@ -40,8 +40,8 @@ a module with Drush. All downloading of modules now resides with composer.
+ 1. Start at the root of your Drupal 8 installation and issue the command
+    <code>composer require drupal/sendgrid_integration</code>.
+ 
+-2. The module will be downloaded from Drupal.org, the dependency API wrapper will
+-   be downloaded from Github, and your main composer.json will be updated.
++2. The module will be downloaded from Drupal.org, the dependency API wrapper
++   will be downloaded from Github, and your main composer.json will be updated.
+ 
+ 3. Navigate to Modules and enable SendGrid Integration in the Mail category.
+ 
+@@ -65,9 +65,9 @@ with the proper headers.
+ We recommend using the module [Mimemail](https://www.drupal.org/project/mimemail)
+ for HTML formatting of emails.
+ 
+-NOTE: Please note that SendGrid Integration also adds a "per module" setting for\
+-the mail formatter/sender below where the site default is defined. The formatter 
+-there needs to be changed to Mimemail.
++NOTE: Please note that SendGrid Integration also adds a "per module" setting
++for\ the mail formatter/sender below where the site default is defined.
++The formatter there needs to be changed to Mimemail.
+ 
+ OPTIONAL
+ --------------------------------------------------------------------------------
+diff --git a/modules/sendgrid_integration_reports/src/Api.php b/modules/sendgrid_integration_reports/src/Api.php
+index b69b78c..d101530 100644
+--- a/modules/sendgrid_integration_reports/src/Api.php
++++ b/modules/sendgrid_integration_reports/src/Api.php
+@@ -10,6 +10,7 @@ use Drupal\Core\Messenger\MessengerInterface;
+ use Drupal\Core\Cache\CacheFactoryInterface;
+ use GuzzleHttp\Client;
+ use GuzzleHttp\Exception\ClientException;
++use Drupal\Core\StringTranslation\StringTranslationTrait;
+ 
+ /**
+  * Class SendGridReportsController.
+@@ -18,6 +19,8 @@ use GuzzleHttp\Exception\ClientException;
+  */
+ class Api {
+ 
++  use StringTranslationTrait;
++
+   /**
+    * Api Key of SendGrid.
+    *
+@@ -106,7 +109,7 @@ class Api {
+     // Display message one time if api key is not set.
+     if (empty($this->apiKey)) {
+       $this->loggerFactory->get('sendgrid_integration_reports')
+-        ->warning(t('SendGrid Module is not setup with API key.'));
++        ->warning($this->t('SendGrid Module is not setup with API key.'));
+       $this->messenger->addWarning('Sendgrid Module is not setup with an API key.');
+     }
+   }
+@@ -156,8 +159,8 @@ class Api {
+     catch (ClientException $e) {
+       $code = Xss::filter($e->getCode());
+       $this->loggerFactory->get('sendgrid_integration_reports')
+-        ->error(t('SendGrid Reports module failed to receive data. HTTP Error Code @errno', ['@errno' => $code]));
+-      $this->messenger->addError(t('SendGrid Reports module failed to receive data. See logs.'));
++        ->error($this->t('SendGrid Reports module failed to receive data. HTTP Error Code @errno', ['@errno' => $code]));
++      $this->messenger->addError($this->t('SendGrid Reports module failed to receive data. See logs.'));
+       return FALSE;
+     }
+     // Sanitize return before using in Drupal.
+@@ -215,7 +218,7 @@ class Api {
+     }
+ 
+     // Set aggregation of stats - default day.
+-    $aggregated_by = isset($config['aggregated_by']) ? $config['aggregated_by'] : 'day';
++    $aggregated_by = $config['aggregated_by'] ?? 'day';
+     $path = 'stats';
+     $query = [
+       'start_date' => $start_date,
+@@ -287,7 +290,7 @@ class Api {
+     $start_date = empty($config['start_date']) ? date('Y-m-d', strtotime('today - 30 days')) : $config['start_date'];
+     $end_date = empty($config['end_date']) ? date('Y-m-d', strtotime('today')) : $config['end_date'];
+     // Set aggregation of stats - default day.
+-    $aggregated_by = isset($config['aggregated_by']) ? $config['aggregated_by'] : 'day';
++    $aggregated_by = $config['aggregated_by'] ?? 'day';
+     $path = 'browsers/stats';
+     $query = [
+       'start_date' => $start_date,
+@@ -338,7 +341,7 @@ class Api {
+     $start_date = empty($config['start_date']) ? date('Y-m-d', strtotime('today - 30 days')) : $config['start_date'];
+     $end_date = empty($config['end_date']) ? date('Y-m-d', strtotime('today')) : $config['end_date'];
+     // Set aggregation of stats - default day.
+-    $aggregated_by = isset($config['aggregated_by']) ? $config['aggregated_by'] : 'day';
++    $aggregated_by = $config['aggregated_by'] ?? 'day';
+ 
+     $path = 'devices/stats';
+     $query = [
+diff --git a/modules/sendgrid_integration_reports/src/Controller/SendGridReportsController.php b/modules/sendgrid_integration_reports/src/Controller/SendGridReportsController.php
+index 6a77813..d510cac 100644
+--- a/modules/sendgrid_integration_reports/src/Controller/SendGridReportsController.php
++++ b/modules/sendgrid_integration_reports/src/Controller/SendGridReportsController.php
+@@ -90,7 +90,7 @@ class SendGridReportsController extends ControllerBase {
+   public function getReports() {
+     $stats = $this->api->getStats('sendgrid_reports_global');
+     $settings = [];
+-    $stats['global'] = isset($stats['global']) ? $stats['global'] : [];
++    $stats['global'] = $stats['global'] ?? [];
+ 
+     foreach ($stats['global'] as $items) {
+       $settings['global'][] = [
+@@ -114,23 +114,23 @@ class SendGridReportsController extends ControllerBase {
+         ],
+       ],
+       'message' => [
+-        '#markup' => t('The following reports are the from the Global Statistics provided by SendGrid. For more comprehensive data, please visit your @dashboard. @cache to ensure the data is current. @settings to alter the time frame of this data.',
++        '#markup' => $this->t('The following reports are the from the Global Statistics provided by SendGrid. For more comprehensive data, please visit your @dashboard. @cache to ensure the data is current. @settings to alter the time frame of this data.',
+           [
+-            '@dashboard' => Link::fromTextAndUrl(t('SendGrid Dashboard'), Url::fromUri('//app.sendgrid.com/'))
++            '@dashboard' => Link::fromTextAndUrl($this->t('SendGrid Dashboard'), Url::fromUri('//app.sendgrid.com/'))
+               ->toString(),
+-            '@cache' => Link::createFromRoute(t('Clear your cache'), 'system.performance_settings')
++            '@cache' => Link::createFromRoute($this->t('Clear your cache'), 'system.performance_settings')
+               ->toString(),
+-            '@settings' => Link::createFromRoute(t('Change your settings'), 'sendgrid_integration_reports.settings_form')
++            '@settings' => Link::createFromRoute($this->t('Change your settings'), 'sendgrid_integration_reports.settings_form')
+               ->toString(),
+           ]
+         ),
+       ],
+       'volume' => [
+-        '#prefix' => '<h2>' . t('Sending Volume') . '</h2>',
++        '#prefix' => '<h2>' . $this->t('Sending Volume') . '</h2>',
+         '#markup' => '<div id="sendgrid-global-volume-chart"></div>',
+       ],
+       'spam' => [
+-        '#prefix' => '<h2>' . t('Spam Reports') . '</h2>',
++        '#prefix' => '<h2>' . $this->t('Spam Reports') . '</h2>',
+         '#markup' => '<div id="sendgrid-global-spam-chart"></div>',
+       ],
+     ];
+@@ -141,11 +141,11 @@ class SendGridReportsController extends ControllerBase {
+       $rows[] = [$key, $value];
+     }
+     $headerbrowser = [
+-      t('Browser'),
+-      t('Click Count'),
++      $this->t('Browser'),
++      $this->t('Click Count'),
+     ];
+     $render['browsers'] = [
+-      '#prefix' => '<h2>' . t('Browser Statistics') . '</h2>',
++      '#prefix' => '<h2>' . $this->t('Browser Statistics') . '</h2>',
+       '#theme' => 'table',
+       '#header' => $headerbrowser,
+       '#rows' => $rows,
+@@ -161,11 +161,11 @@ class SendGridReportsController extends ControllerBase {
+       ];
+     }
+     $headerdevices = [
+-      t('Device'),
+-      t('Open Count'),
++      $this->t('Device'),
++      $this->t('Open Count'),
+     ];
+     $render['devices'] = [
+-      '#prefix' => '<h2>' . t('Device Statistics') . '</h2>',
++      '#prefix' => '<h2>' . $this->t('Device Statistics') . '</h2>',
+       '#theme' => 'table',
+       '#header' => $headerdevices,
+       '#rows' => $rowsdevices,
+diff --git a/modules/sendgrid_integration_reports/src/Form/SendGridReportsSettingsForm.php b/modules/sendgrid_integration_reports/src/Form/SendGridReportsSettingsForm.php
+index 75d7195..5bd46fb 100644
+--- a/modules/sendgrid_integration_reports/src/Form/SendGridReportsSettingsForm.php
++++ b/modules/sendgrid_integration_reports/src/Form/SendGridReportsSettingsForm.php
+@@ -70,35 +70,35 @@ class SendGridReportsSettingsForm extends ConfigFormBase {
+     ];
+ 
+     $form['sendgrid_integration_reports']['message'] = [
+-      '#markup' => t('Data and responses from Sendgrid are cached for performance reasons. If you make changes to these settings charts cache will be dropped automatically.'),
++      '#markup' => $this->t('Data and responses from Sendgrid are cached for performance reasons. If you make changes to these settings charts cache will be dropped automatically.'),
+     ];
+ 
+     $current_date = date_format(new \Datetime(), 'Y-m-d');
+     $form['sendgrid_integration_reports']['start_date'] = [
+       '#type' => 'date',
+-      '#title' => t('Global Stats Start Date'),
++      '#title' => $this->t('Global Stats Start Date'),
+       '#default_value' => !empty($config['start_date']) ? $config['start_date'] : date_format(new \Datetime('-30 days'), 'Y-m-d'),
+       '#attributes' => ['type' => 'date', 'max' => $current_date],
+       '#required' => FALSE,
+-      '#description' => t('Start date in the format of mm/dd/YYYY. Defaults to 30 days back.'),
++      '#description' => $this->t('Start date in the format of mm/dd/YYYY. Defaults to 30 days back.'),
+     ];
+ 
+     $form['sendgrid_integration_reports']['end_date'] = [
+       '#type' => 'date',
+-      '#title' => t('Global Stats End Date'),
++      '#title' => $this->t('Global Stats End Date'),
+       '#default_value' => !empty($config['end_date']) ? $config['end_date'] : $current_date,
+       '#attributes' => ['type' => 'date', 'max' => $current_date],
+       '#required' => FALSE,
+-      '#description' => t('End date in the format of mm/dd/YYYY. Defaults to today.'),
++      '#description' => $this->t('End date in the format of mm/dd/YYYY. Defaults to today.'),
+     ];
+ 
+     $options = ['day', 'week', 'month'];
+     $form['sendgrid_integration_reports']['aggregated_by'] = [
+       '#type' => 'select',
+-      '#title' => t('Global Stats Aggregation'),
++      '#title' => $this->t('Global Stats Aggregation'),
+       '#default_value' => !empty($config['aggregated_by']) ? $config['aggregated_by'] : 0,
+       '#required' => FALSE,
+-      '#description' => t('Aggregation of data. Defaults to day.'),
++      '#description' => $this->t('Aggregation of data. Defaults to day.'),
+       '#options' => array_combine($options, $options),
+     ];
+ 
+@@ -113,7 +113,7 @@ class SendGridReportsSettingsForm extends ConfigFormBase {
+     if (strtotime($values['start_date']) > strtotime($values['end_date'])) {
+       $form_state->setError(
+         $form['sendgrid_integration_reports']['start_date'],
+-        t('The %start could not be later than %end.', [
++        $this->t('The %start could not be later than %end.', [
+           '%start' => $form['sendgrid_integration_reports']['start_date']['#title'],
+           '%end' => $form['sendgrid_integration_reports']['end_date']['#title'],
+         ])
+diff --git a/sendgrid_integration.api.php b/sendgrid_integration.api.php
+index 54498f7..7c70e06 100644
+--- a/sendgrid_integration.api.php
++++ b/sendgrid_integration.api.php
+@@ -23,7 +23,7 @@
+  * @param array $response
+  *   Response from the SendGrid API.
+  */
+-function hook_sendgrid_integration_sent($to, $unique_args, $response) {
++function hook_sendgrid_integration_sent($to, array $unique_args, array $response) {
+   if ($unique_args['module'] == 'my_module' && $result_code = 200) {
+     \Drupal::logger('My Module')
+       ->notice('My module has successfully sent email');
+@@ -31,19 +31,19 @@ function hook_sendgrid_integration_sent($to, $unique_args, $response) {
+ }
+ 
+ /**
+- * This hook is invoked before mail is sent, allowing modification of
+- * unique_args.
++ * This hook is invoked before mail is sent.
++ *
++ * Allowing modification of unique_args.
+  *
+  * @param array $unique_args
+  *   Unique arguments.
+- *
+  * @param array $message
+- *   The email message
++ *   The email message.
+  *
+  * @return array
+  *   Returned array will be used as unique arguments.
+  */
+-function hook_sendgrid_integration_unique_args_alter($unique_args, $message) {
++function hook_sendgrid_integration_unique_args_alter(array $unique_args, array $message) {
+   $unique_args['time'] = time();
+   $unique_args['subject'] = $message['params']['subject'];
+ 
+@@ -51,8 +51,9 @@ function hook_sendgrid_integration_unique_args_alter($unique_args, $message) {
+ }
+ 
+ /**
+- * This hook is invoked before mail is sent, allowing modification of
+- * categories.
++ * This hook is invoked before mail is sent.
++ *
++ * Allowing modification of categories.
+  *
+  * @param array $categories
+  *   An array of categories for Sendgrid statistics.
+@@ -60,7 +61,7 @@ function hook_sendgrid_integration_unique_args_alter($unique_args, $message) {
+  * @return array
+  *   Returned array will be used as categories.
+  */
+-function hook_sendgrid_integration_categories_alter($message, $categories) {
++function hook_sendgrid_integration_categories_alter($message, array $categories) {
+   $categories[] = 'from_' . $message['from'];
+   $categories[] = $message['language'];
+ 
+diff --git a/sendgrid_integration.install b/sendgrid_integration.install
+index 0b7b2c4..2b31a55 100644
+--- a/sendgrid_integration.install
++++ b/sendgrid_integration.install
+@@ -2,7 +2,7 @@
+ 
+ /**
+  * @file
+- * Contains install and update functions for SendGrid Integration
++ * Contains install and update functions for SendGrid Integration.
+  */
+ 
+ use Drupal\Core\Url;
+diff --git a/sendgrid_integration.module b/sendgrid_integration.module
+index 4f415b8..fc4e302 100644
+--- a/sendgrid_integration.module
++++ b/sendgrid_integration.module
+@@ -19,7 +19,7 @@ function sendgrid_integration_help($route_name, RouteMatchInterface $route_match
+     case 'help.page.sendgrid_integration':
+       $output .= '<h3>' . \Drupal::translation()->translate('About') . '</h3>';
+       $output .= '<p>' . \Drupal::translation()
+-          ->translate('Module provides own implementation of MailSystemIntegration, replacing the default implementation and uses SendGrid Web API instead.') . '</p>';
++        ->translate('Module provides own implementation of MailSystemIntegration, replacing the default implementation and uses SendGrid Web API instead.') . '</p>';
+   }
+   return $output;
+ }
+diff --git a/src/Form/SendGridSettingsForm.php b/src/Form/SendGridSettingsForm.php
+index 733d814..946aeba 100644
+--- a/src/Form/SendGridSettingsForm.php
++++ b/src/Form/SendGridSettingsForm.php
+@@ -9,7 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
+ /**
+- * Class SendGridSettingsForm.
++ * Class SendGrid Settings Form.
+  *
+  * @package Drupal\sendgrid_integration\Form
+  */
+@@ -106,14 +106,14 @@ class SendGridSettingsForm extends ConfigFormBase {
+       '#type' => 'checkbox',
+       '#title' => $this->t('Track Opens'),
+       '#description' => $this->t('Track opening of emails. This will include a small image in each email. Set to off by default.'),
+-      '#default_value' => !empty($config->get('trackopens')) ? $config->get('trackopens') : 0
++      '#default_value' => !empty($config->get('trackopens')) ? $config->get('trackopens') : 0,
+     ];
+ 
+     $form['settings']['sendgrig_intergration_trackclicks'] = [
+       '#type' => 'checkbox',
+       '#title' => $this->t('Track Clicks'),
+       '#description' => $this->t('Track the clicking of links in email. Set to off by default.'),
+-      '#default_value' => !empty($config->get('trackclicks')) ? $config->get('trackclicks') : 0
++      '#default_value' => !empty($config->get('trackclicks')) ? $config->get('trackclicks') : 0,
+     ];
+ 
+     return parent::buildForm($form, $form_state);
+diff --git a/src/Form/SendGridTestForm.php b/src/Form/SendGridTestForm.php
+index 48563de..fd141c3 100644
+--- a/src/Form/SendGridTestForm.php
++++ b/src/Form/SendGridTestForm.php
+@@ -112,7 +112,7 @@ class SendGridTestForm extends FormBase {
+     $form['include_attachment'] = [
+       '#title' => $this->t('Include attachment'),
+       '#type' => 'checkbox',
+-      '#description' => t('If checked, the Drupal icon will be included as an attachment with the test email.'),
++      '#description' => $this->t('If checked, the Drupal icon will be included as an attachment with the test email.'),
+       '#default_value' => TRUE,
+     ];
+     $form['body'] = [
+diff --git a/src/Plugin/Mail/SendGridMail.php b/src/Plugin/Mail/SendGridMail.php
+index b1e5513..b8e9ede 100644
+--- a/src/Plugin/Mail/SendGridMail.php
++++ b/src/Plugin/Mail/SendGridMail.php
+@@ -21,16 +21,16 @@ use SendGrid\Mail\ClickTracking;
+ use SendGrid\Mail\From;
+ use SendGrid\Mail\Mail;
+ use SendGrid\Mail\OpenTracking;
+-use SendGrid\Mail\Personalization;
+ use SendGrid\Mail\ReplyTo;
+-use SendGrid\Mail\SandBoxMode;
+ use SendGrid\Mail\SpamCheck;
+ use SendGrid\Mail\To;
+ use SendGrid\Mail\TrackingSettings;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\Core\StringTranslation\StringTranslationTrait;
+ 
+ /**
+- * @file
++ * Class SendGridMail.
++ *
+  * Implements Drupal MailSystemInterface.
+  *
+  * @Mail(
+@@ -41,6 +41,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
+  */
+ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+ 
++  use StringTranslationTrait;
++
+   /**
+    * {@inheritdoc}
+    */
+@@ -138,13 +140,13 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+ 
+   /**
+    * {@inheritdoc}
++   *
+    * @throws \SendGrid\Exception\SendgridException
+    */
+   public function mail(array $message): bool {
+-    # Begin by creating instances of objects needed.
++    // Begin by creating instances of objects needed.
+     $sendgrid_message = new Mail();
+     $personalization0 = $sendgrid_message->getPersonalization();
+-    $sandbox_mode = new SandBoxMode();
+ 
+     $site_config = $this->configFactory->get('system.site');
+     $sendgrid_config = $this->configFactory->get('sendgrid_integration.settings');
+@@ -198,7 +200,7 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+       $spam_check->setEnable(FALSE);
+     }
+ 
+-    # Add UID metadata to the message that matches the drupal user ID.
++    // Add UID metadata to the message that matches the drupal user ID.
+     if (isset($message['params']['account']->uid)) {
+       /** @var \Drupal\user\Entity\User $mailuser */
+       $mailuser = $message['params']['account'];
+@@ -247,8 +249,10 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+     $sendgrid_message->addCategories($categories);
+     $personalization0->setSubject($message['subject']);
+     $from = new From($data['from'], $data['fromname']);
++    // phpcs:disable
+     unset($data);
+-    # Set the from address and add a name if it exists.
++    // phpcs:enable
++    // Set the from address and add a name if it exists.
+     $sendgrid_message->setFrom($from);
+ 
+     // If there are multiple recipients we have to explode and walk the values.
+@@ -258,7 +262,7 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+         // Remove unnecessary spaces.
+         $value = trim($value);
+         $sendtoarrayparsed = $this->parseAddress($value);
+-        $personalization0->addTo(new To($sendtoarrayparsed[0], isset($sendtoarrayparsed[1]) ? $sendtoarrayparsed[1] : NULL));
++        $personalization0->addTo(new To($sendtoarrayparsed[0], $sendtoarrayparsed[1] ?? NULL));
+       }
+     }
+     else {
+@@ -276,7 +280,8 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+     foreach ($message['headers'] as $key => $value) {
+       switch (mb_strtolower($key)) {
+         case 'content-type':
+-          // Parse several values on the Content-type header, storing them in an array like
++          // Parse several values on the Content-type header,
++          // storing them in an array like
+           // key=value -> $vars['key']='value'.
+           $vars = explode(';', $value);
+           foreach ($vars as $i => $var) {
+@@ -287,8 +292,9 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+               $vars[$new_key] = $new_var;
+             }
+           }
+-          // If $vars is empty then set an empty value at index 0 to avoid a PHP warning in the next statement.
+-          $vars[0] = isset($vars[0]) ? $vars[0] : '';
++          // If $vars is empty then set an empty value at index 0 to avoid
++          // a PHP warning in the next statement.
++          $vars[0] = $vars[0] ?? '';
+           // Nested switch to process the various content types. We only care
+           // about the first entry in the array.
+           switch ($vars[0]) {
+@@ -313,7 +319,6 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+               $sendgrid_message->addContent('text/plain', MailFormatHelper::wrapMail($body_plain));
+               break;
+ 
+-
+             case 'multipart/alternative':
+               // Get the boundary ID from the Content-Type header.
+               $boundary = $this->getSubString($message['body'], 'boundary', '"', '"');
+@@ -322,7 +327,8 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+               // Split the body based on the boundary ID.
+               $body_parts = $this->boundrySplit($message['body'], $boundary);
+               foreach ($body_parts as $body_part) {
+-                // If plain/text within the body part, add it to $mailer->AltBody.
++                // If plain/text within the body part,
++                // add it to $mailer->AltBody.
+                 if (strpos($body_part, 'text/plain')) {
+                   // Clean up the text.
+                   $body_part = trim($this->removeHeaders(trim($body_part)));
+@@ -357,19 +363,22 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+ 
+                   // Process the internal parts.
+                   foreach ($body_parts2 as $body_part2) {
+-                    // If plain/text within the body part, add it to $mailer->AltBody.
++                    // If plain/text within the body part,
++                    // add it to $mailer->AltBody.
+                     if (strpos($body_part2, 'text/plain')) {
+                       // Clean up the text.
+                       $body_part2 = trim($this->removeHeaders(trim($body_part2)));
+                       $sendgrid_message->addContent('text/plain', MailFormatHelper::wrapMail(MailFormatHelper::htmlToText($body_part2)));
+                     }
+-                    // If plain/html within the body part, add it to $mailer->Body.
++                    // If plain/html within the body part,
++                    // add it to $mailer->Body.
+                     elseif (strpos($body_part2, 'text/html')) {
+                       // Get the encoding.
+                       $body_part2_encoding = trim($this->getSubString($body_part2, 'Content-Transfer-Encoding', ':', "\n"));
+                       // Clean up the text.
+                       $body_part2 = trim($this->removeHeaders(trim($body_part2)));
+-                      // Check whether the encoding is base64, and if so, decode it.
++                      // Check whether the encoding is base64,
++                      // and if so, decode it.
+                       if (mb_strtolower($body_part2_encoding) == 'base64') {
+                         // Save the decoded HTML content.
+                         $sendgrid_message->addContent('text/html', base64_decode($body_part2));
+@@ -384,7 +393,8 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+                 else {
+                   // This parses the message if there is no internal content
+                   // type set after the multipart/mixed.
+-                  // If text/plain within the body part, add it to $mailer->Body.
++                  // If text/plain within the body part,
++                  // add it to $mailer->Body.
+                   if (strpos($body_part, 'text/plain')) {
+                     // Clean up the text.
+                     $body_part = trim($this->removeHeaders(trim($body_part)));
+@@ -403,19 +413,19 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+               break;
+ 
+             default:
+-              // Everything else is unknown so we log and send the message as text.
++              // Everything else is unknown so we log and
++              // send the message as text.
+               \Drupal::messenger()
+-                ->addError(t('The %header of your message is not supported by SendGrid and will be sent as text/plain instead.', ['%header' => "Content-Type: $value"]));
++                ->addError($this->t('The %header of your message is not supported by SendGrid and will be sent as text/plain instead.', ['%header' => "Content-Type: $value"]));
+               $this->logger->error("The Content-Type: $value of your message is not supported by PHPMailer and will be sent as text/plain instead.");
+               // Force the email to be text.
+               $sendgrid_message->addContent('text/plain', MailFormatHelper::wrapMail(MailFormatHelper::htmlToText($message['body'])));
+           }
+           break;
+-        // End Content-type parsing
+ 
+         case 'reply-to':
+           $sendreplyto = $this->parseAddress($message['headers'][$key]);
+-          $reply_to = new ReplyTo($sendreplyto[0], isset($sendreplyto[1]) ? $sendreplyto[1] : NULL);
++          $reply_to = new ReplyTo($sendreplyto[0], $sendreplyto[1] ?? NULL);
+           $sendgrid_message->setReplyTo($reply_to);
+           break;
+       }
+@@ -453,7 +463,6 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+     // -----------------------
+     // END - BCC and CC Address Handling
+     // -----------------------
+-
+     // Prepare message attachments and params attachments.
+     if (isset($message['attachments']) && !empty($message['attachments'])) {
+       foreach ($message['attachments'] as $attachmentitem) {
+@@ -474,8 +483,6 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+           catch (\Exception $e) {
+             $this->logger->error('Attachment processing failed' . $e->getMessage());
+           }
+-
+-
+         }
+       }
+     }
+@@ -720,8 +727,9 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+       if (preg_match($pattern, $line)) {
+         $line = rtrim(array_shift($part_array));
+         // Remove line containing matched header.
+-        // If line ends in a ';' and the next line starts with four spaces, it's a continuation
+-        // of the header split onto the next line. Continue removing lines while we have this condition.
++        // If line ends in a ';' and the next line starts with four spaces,
++        // it's a continuation of the header split onto the next line.
++        // Continue removing lines while we have this condition.
+         while (substr($line, -1) == ';' && count($part_array) > 0 && substr($part_array[0], 0, 4) == '    ') {
+           $line = rtrim(array_shift($part_array));
+         }
+@@ -737,12 +745,16 @@ class SendGridMail implements MailInterface, ContainerFactoryPluginInterface {
+ 
+   /**
+    * Split an email address into it's name and address components.
+-   * Returns an array with the first element as the email address and the
+-   * second element as the name.
+    *
+-   * @param $email string
++   * Returns an array with the first element as the email address.
++   *
++   * And the second element as the name.
++   *
++   * @param string $email
++   *   An email.
+    *
+    * @return mixed
++   *   Return mixed data.
+    */
+   protected function parseAddress(string $email) {
+     if (preg_match(self::SENDGRID_INTEGRATION_EMAIL_REGEX, $email, $matches)) {
+diff --git a/tests/sendgrid_integration.mail.test b/tests/sendgrid_integration.mail.test
+index af16b78..df2e63d 100644
+--- a/tests/sendgrid_integration.mail.test
++++ b/tests/sendgrid_integration.mail.test
+@@ -21,4 +21,4 @@ class SendgridIntegrationTestCaseMail extends SendgridIntegrationTestCase {
+     ];
+   }
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/tests/sendgrid_integration.mail_test.test b/tests/sendgrid_integration.mail_test.test
+index fd98c61..e92eaa2 100644
+--- a/tests/sendgrid_integration.mail_test.test
++++ b/tests/sendgrid_integration.mail_test.test
+@@ -21,4 +21,4 @@ class SendgridIntegrationTestCaseMail extends SendgridIntegrationTestCase {
+     ];
+   }
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/tests/sendgrid_integration.test b/tests/sendgrid_integration.test
+index 3273aa0..2431e31 100644
+--- a/tests/sendgrid_integration.test
++++ b/tests/sendgrid_integration.test
+@@ -15,14 +15,14 @@ class SendgridIntegrationTestCase extends DrupalWebTestCase {
+    *
+    * @var object
+    */
+-  protected $admin_user;
++  protected $adminUser;
+ 
+   /**
+    * Normal web user.
+    *
+    * @var object
+    */
+-  protected $web_user;
++  protected $webUser;
+ 
+   /**
+    * {@inheritdoc}
+@@ -78,5 +78,4 @@ class SendgridIntegrationTestCase extends DrupalWebTestCase {
+     $this->assertText(t('API Secret Key field is required.'), t('SendGrid API Settings Rejected save without secret key.'));
+   }
+ 
+-
+ }

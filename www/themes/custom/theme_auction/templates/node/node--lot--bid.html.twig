@@ -1,0 +1,97 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+{%
+    set classes = [
+    'c-node',
+]
+%}
+
+{{ attach_library('classy/node') }}
+
+<div class="c-lot">
+    <header class="c-lot__header">
+        <h1 class="c-lot__title">{{ label }}
+            <a class="lot__title__back" href="Javascript:history.go(-2);">{{ 'Terug'|t }}</a>
+        </h1>
+        <div class="c-lot__baseline">{{ content.field_auction_reference }}</div>
+    </header>
+
+    <div class="o-grid">
+        <div class="o-grid__item u-1/1 u-1/2@tablet">
+            <div class="c-lot__block">
+                <h2 class="c-lot-label">{{ 'Content'|t }}</h2>
+                {{ content.field_p_lot_content }}
+            </div>
+        </div>
+        <div class="o-grid__item u-1/1 u-1/2@tablet">
+        {% if auction_status_lot_time %}
+            {% set date = enddate|date_modify(auction_status_lot_time)|date('Y/m/d H:i:s') %}
+            {% set enddate2 = enddate|date_modify(auction_status_lot_time)|date('d/m/Y') %}
+            {% set endtime2 = enddate|date_modify(auction_status_lot_time)|date('H:i:s') %}
+            {% set now = "now"|date("Y/m/d H:i:s") %}
+            {% if now > auction_status_lot_time %}
+                <div class="c-lot-counter-wrapper">
+                    <div class="c-lot-timer-closed js-disabled"> {{ 'Dit lot is afgesloten'|t }} </div>
+                    <h4 class="c-lot-teaser__subtitle c-lot-title">{{ 'Bieden op dit lot eindigt binnen'|t }}</h4>
+                    <div class="c-lot-counter c-lot-timer" data-countdown="{{ date }}"></div>
+                    <h4 class="c-lot-teaser__subtitle c-lot-title">{{ 'Bieden op dit lot eindigt op'|t }}</h4>
+                    <p class="c-lot-teaser__enddate">{{ enddate2 }} {{ 'om'|t }} {{ endtime2 }}</p>
+                </div>
+            {% else %}
+                <div class="c-lot-timer-closed"> {{ 'Dit lot is afgesloten'|t }} </div>
+            {% endif %}
+        {% else %}
+            <div class="c-lot-timer-closed"> {{ 'Dit lot is afgesloten'|t }} </div>
+        {% endif %}
+        <div class="c-lot-highest-offer-wrapper">
+            {% if highest_offer %}
+                <h4 class="c-lot-teaser__subtitle">{{ 'Leading bid'|t }}</h4>
+                <span class="js-highestOffer">€ {{ highest_offer }}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('[data-countdown]').each(function () {
+            var $this = $(this), finalDate = $(this).data('countdown');
+            
+            $this.countdown(finalDate);
+            
+            $this.on('update.countdown', function (event) {
+                $this.html(event.strftime(''
+                  + '<div><span>%D</span> day%!d </div>'
+                  + '<div><span>%H</span> hr </div>'
+                  + '<div><span>%M</span> min </div>'
+                  + '<div><span>%S</span> sec</div>'
+                ));
+                $('.form-item-bod').addClass('js-visible').removeClass('js-disabled');
+                $('.form-wrapper').addClass('js-visible').removeClass('js-disabled');
+                
+            });
+            
+            $this.on('finish.countdown', function (event) {
+                $this.html('This offer has expired!').addClass('js-disabled');
+                $this.parent().find('.c-lot-title').addClass('js-disabled');
+                $this.parent().find('.c-lot-teaser__enddate').addClass('js-disabled');
+                $this.parent().find('.c-lot-timer-closed').removeClass('js-disabled').addClass('js-visible');
+                $this.parent().parent().find('.c-lot-bod-wrapper').addClass('js-disabled');
+                $this.parent().parent().find('.c-lot-result-wrapper').removeClass('js-disabled').addClass('js-visible');
+                $this.parent().parent().find('.c-lot-result-wrapper').removeClass('js-disabled').addClass('js-visible');
+                $('.form-item-bod').removeClass('js-visible').addClass('js-disabled');
+                $('.form-wrapper').removeClass('js-visible').addClass('js-disabled');
+                setInterval(function () {
+                    div.ajax.reload(null, false);
+                    // user paging is not reset on reload
+                }, 100000);
+            });
+        });
+    });
+</script>

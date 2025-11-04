@@ -1,0 +1,114 @@
+<?php
+
+use Drupal\node\NodeInterface;
+use Drupal\Component\Utility\Html;
+
+/**
+ * @file
+ * Contains auction_bid.module.
+ */
+
+  /**
+   * Update exisiting Loten with highest bid
+   */
+  function auction_bid_update_9001() {
+    $nids = \Drupal::entityQuery('node')
+      ->condition('type','lot')
+      ->execute();
+    $nodes =  \Drupal\node\Entity\Node::loadMultiple($nids);
+
+    foreach ($nodes as $node_lot) {
+
+      // GET SUBMISSIONS FOR THIS LOT
+      $select = \Drupal::service('database')
+        ->select('webform_submission_data', 'wsd')
+        ->fields('wsd', array('sid'))
+        //->orderBy('wsd.sid', 'DESC')
+        ->condition('wsd.webform_id', 'offer', '=')
+        ->condition('wsd.name', 'lot_select', '=')
+        ->condition('wsd.value', $node_lot->id(), '=')
+        ->execute();
+      
+      $results = $select->fetchAll(\PDO::FETCH_COLUMN);
+
+      if ($results) {
+        $select_max = \Drupal::service('database')
+          ->select('webform_submission_data', 'wsd')
+          ->fields('wsd', array('value'))
+          ->condition('wsd.sid', $results, 'IN')
+          ->condition('wsd.name', 'bod', '=')
+          ->execute();
+
+        $result_max = $select_max->fetchAll(\PDO::FETCH_COLUMN);
+
+        rsort($result_max, SORT_NUMERIC);
+        $highest_bid = $result_max[0];
+
+      }
+      else {
+        $highest_bid='0';
+      }
+      
+      $node_lot->set('field_highest_bid', $highest_bid);
+      $node_lot->save();
+
+    }
+  }
+
+  /**
+   * Implements hook_mail()
+   *
+   * @param $key
+   * @param $message
+   * @param $params
+   */
+
+  function auction_bid_mail($key, &$message, $params) {
+    $options = ['langcode' => $message['langcode']];
+    
+    switch ($key) {
+      case 'higher_bid':
+        $message['from'] = \Drupal::config('system.site')->get('mail');
+        $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+        switch ($message['langcode']) {
+          case 'nl':
+            $subject = "Uw eerder geplaatst bod op {$params['bid_title']} werd overtroffen";
+            $body = "<p>Geachte,</p>
+            <p>Uw eerder geplaatst bod op {$params['bid_title']} werd overtroffen.</p>
+            <p>{$params['lot_content']}</p>
+            <p>Gelieve een nieuw bod in te voeren voor desbetreffend lot.</p>
+            <p>Het hoogste bod bedraagt momenteel € {$params['highest_bid']}</p>
+            <p>Voor bijkomende gewenste info, steeds welkom...</p>
+            <p>Vriendelijke groeten,</p>
+            <p>Vin.auction</p>";
+            break;
+          case 'fr':
+            $subject = "Votre offre sur {$params['bid_title']} est surpassé.";
+            $body = "<p>Bonjour,</p>
+            <p>Votre offre sur {$params['bid_title']} est surpassé.</p>
+            <p>{$params['lot_content']}</p>
+            <p>Veuillez placer une nouvelle offre pour ce lot.</p>
+            <p>Pour des informations supplémentaire, vous êtes le bienvenue</p>
+            <p>l Offre la plus haute a ce moment est  {$params['highest_bid']} euros.</p>
+            <p>Cordialement</p>
+            <p>Vin.auction";
+            break;
+          case 'en':
+          default:
+            $subject = "Your bid ({$params['bid_title']}) is no longer leading!";
+            $body = "<p>Hello,</p>
+            <p>Your bid ({$params['bid_title']}) is no longer leading!</p>
+            <p>{$params['lot_content']}</p>
+            <p>Place a new bid for this respective lot.</p>
+            <p>The leading bid is at this moment € {$params['highest_bid']}.</p>
+            <p>For further questions, you’re welcome...</p>
+            <p>Kind Regards</p>
+            Vin.auction";
+            break;
+        }
+        $body = \Drupal\Core\Render\Markup::create($body);
+        $message['subject'] = $subject;
+        $message['body'][] =  $body;
+      break;
+    }
+  }

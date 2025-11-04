@@ -1,0 +1,31 @@
+diff --git a/menu_token.module b/menu_token.module
+index 73fa087..9766ade 100644
+--- a/menu_token.module
++++ b/menu_token.module
+@@ -50,7 +50,7 @@ function menu_token_form_menu_link_content_form_alter(&$form, FormStateInterface
+   if (!empty($link_id_from_entity)) {
+     $config_menu = \Drupal::entityTypeManager()->getStorage('link_configuration_storage')->load($uuid);
+     if (!empty($config_menu)) {
+-      $config_array = unserialize($config_menu->get('configurationSerialized'));
++      $config_array = unserialize((string) $config_menu->get('configurationSerialized'));
+     }
+     else {
+       $config_array = ["menu_token_enabled" => 0, "remove_if_replacement_is_not_present" => 0];
+@@ -386,7 +386,7 @@ function replace_links_with_tokens(Token $token_service, $replace_with, $relevan
+ 
+   // Replace nothing to mess here all action is in hook.
+   if (!empty($config_menu)) {
+-    $configuration = unserialize($config_menu->configurationSerialized);
++    $configuration = unserialize((string) $config_menu->configurationSerialized);
+     $links[$relevant_link['id']][$replace_with] = $token_service->replace($links[$relevant_link['id']][$replace_with], [], ["configuration" => $configuration], $bubbleableMetadata);
+     if (is_null($links[$relevant_link['id']][$replace_with])) {
+       $links[$relevant_link['id']][$replace_with] = $token_service->replace($config_menu->linkid, [], ["configuration" => $configuration], $bubbleableMetadata);
+@@ -447,7 +447,7 @@ function menu_token_menu_links_discovered_alter(&$links) {
+         ->load($uuId_from_link);
+ 
+       if (!empty($configMenu)) {
+-        $config = unserialize($configMenu->configurationSerialized);
++        $config = unserialize((string) $configMenu->configurationSerialized);
+         $context_manager->prepareContextualLinks($relevant_link, $config);
+         replace_links_with_tokens($token_service, "url", $relevant_link, $links, $bubbleable_metadata);
+         replace_links_with_tokens($token_service, "title", $relevant_link, $links, $bubbleable_metadata);

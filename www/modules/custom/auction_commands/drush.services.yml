@@ -1,0 +1,6 @@
+services:
+  auction_commands.commands:
+    class: \Drupal\auction_commands\Commands\AuctionCommands
+    tags:
+      - { name: drush.command }
+    arguments: ['@entity_type.manager', '@logger.factory']

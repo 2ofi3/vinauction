@@ -1,0 +1,8 @@
+auction_proforma.mailto_form:
+  path: '/auction_proforma/form/mailto'
+  defaults:
+    _form: '\Drupal\auction_proforma\Form\MailtoForm'
+    _title: 'MailtoForm'
+  requirements:
+    _access: 'TRUE'
+  

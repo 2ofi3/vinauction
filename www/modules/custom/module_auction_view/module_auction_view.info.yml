@@ -1,0 +1,8 @@
+name: Auction view
+type: module
+description: Custom functions in auction overview
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:path_alias

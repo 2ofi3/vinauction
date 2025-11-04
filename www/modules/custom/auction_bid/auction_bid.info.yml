@@ -1,0 +1,8 @@
+name: Auction Bid
+type: module
+description: Auction bidding components
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:path_alias

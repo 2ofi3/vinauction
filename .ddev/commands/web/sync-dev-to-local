@@ -1,0 +1,16 @@
+#!/bin/bash
+## Description: Import the database and assets from development into the ddev environment.
+## Usage: sync-dev-to-local
+## Example: sync-dev-to-local
+## ProjectTypes: drupal8,drupal9,drupal10
+echo "Importing DB from production environment..."
+cd /var/www/html
+drush sql-drop -y && drush sql-sync @self.prod @self -y
+echo "Importing config split DEV settings..."
+## drush config-split:import dev -y
+drush cr
+echo "Local db replaced with database from development!"
+echo "Syncing files from development to local ddev..."
+drush core-rsync @self.prod:%files @self:%files -y
+drush cr
+echo "Files are now synced from development to local"

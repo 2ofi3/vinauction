@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * Theme override to display a single page.
+ *
+ * Regions:
+ * - page.content: The main content of the current page.
+ * - page.footer: Items for the footer region.
+ *
+ * @see template_preprocess_page()
+ * @see html.html.twig
+ */
+#}
+
+{% include '@theme_auction/_partials/header.html.twig' %}
+
+<div class="container">
+  {{ page.content }}
+</div>
+
+{% include '@theme_auction/_partials/footer.html.twig' %}

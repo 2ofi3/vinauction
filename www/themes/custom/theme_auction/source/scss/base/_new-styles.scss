@@ -1,0 +1,615 @@
+// LAYOUT
+.container {
+  max-width: 1400px;
+  margin-right: auto;
+  margin-left: auto;
+  //border: 1px solid red;
+  @include mq($from: laptop) {
+    padding: 0 1.5rem;
+  }
+}
+
+.region-content,
+.c-auction {
+  margin-top: 1rem;
+  @include mq($from: laptop) {
+    margin-top: 2rem;
+  }
+}
+
+.c-maintenance {
+  @include rem(padding, 3rem);
+  @include rem(margin, 3rem);
+  border: 1px solid var(--accent-color);
+  background-color: var(--accent-color);
+  color: var(--c-white);
+  border-radius: 5px;
+}
+
+/* .c-header */
+.c-header {
+  border-bottom: 1px solid $grey-color;
+  margin-bottom: 0;
+
+  @include mq($until: laptop) {
+    text-align: center;
+  }
+}
+
+.c-header__top {
+  background-color: $dark-grey-color2;
+  @include rem(padding, 1rem 0);
+  ul.menu a.is-active {
+    color: var(--accent-color);
+  }
+}
+
+.c-header__inner {
+  padding: 0.75rem 0;
+  @include mq($from: laptop) {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    padding: 1rem 0;
+  }
+}
+
+.region-header {
+  padding: 0.15rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  @include mq($from: laptop) {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 0.15rem 0;
+  }
+}
+
+.region-menu {
+  position: relative;
+  @include mq($from: laptop) {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+  }
+}
+
+.c-header__side {
+  @include mq($until: laptop) {
+    border-top: 1px solid $grey-color;
+    margin-top: 10px;
+  }
+}
+
+/* language-switcher */
+.c-language-nav {
+}
+
+.block-lang-dropdown {
+  float: right;
+}
+
+.c-header__inner .c-language-nav {
+  top: 85px;
+}
+
+.c-language-nav__menu {
+  ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: right;
+
+    li {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+
+      a {
+        @include rem(font-size, 1.4rem);
+      }
+    }
+  }
+}
+
+.c-auction--wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  //justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 40px;
+    background: $light-grey-color;
+    width: 100%;
+    //@include rem(font-size, 1rem);
+    @include mq($from: tablet) {
+      width: 48%;
+    }
+    @include mq($from: laptop) {
+      width: 31%;
+    }
+  }
+  &.c-4-cols {
+    li {
+      @include mq($from: tablet) {
+        width: 31%;
+      }
+      @include mq($from: laptop) {
+        width: 22%;
+      }
+    }
+  }
+}
+
+.c-lot-detail {
+  span {
+    width: 100%;
+    display: block;
+    @include rem(font-size, 1.5rem);
+    @include rem(line-height, 1.9rem);
+  }
+}
+
+.c-lot-cost {
+  @include rem(font-size, 1rem);
+  @include rem(margin-top, 0.8rem);
+}
+
+.c-lot-teaser__info {
+  padding: 1rem 1rem 0 1rem;
+  width: 60%;
+}
+
+.c-lot-teaser__info-top {
+  display: flex;
+  width: 100%;
+  position: relative;
+  margin-bottom: 1.5rem;
+  justify-content: space-between;
+  background: $color-white;
+  @include mq($from: laptop) {
+    margin-bottom: 0;
+  }
+}
+
+.c-lot-teaser__info-middle {
+  padding: 0 1rem;
+  width: 100%;
+  background: $color-white;
+}
+
+.c-lot-teaser__info-bottom {
+  @include rem(padding, 2rem 1.6rem);
+  width: 100%;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.c-lot__block {
+  padding: 1rem 0;
+  width: 100%;
+}
+
+.c-lot-teaser__enddate,
+.c-lot-timer-closed {
+  padding: 0.3rem;
+  border-radius: 7px;
+  font-weight: 900;
+  position: relative;
+  width: 100%;
+  //margin-bottom: 1rem;
+  span {
+    @include rem(padding, 0 0.5rem 0 2rem);
+    @include rem(font-size, 1.28rem);
+  }
+  &::before {
+    content: "\e8b5";
+    font-family: "Material Icons";
+    position: absolute;
+    left: 0.5rem;
+    top: 0.35rem;
+    display: block;
+  }
+}
+
+.c-lot-teaser__enddate {
+  background-color: lighten($brand-color-green, 50%);
+  color: $brand-color-green;
+  margin-bottom: 2rem;
+}
+
+.c-lot-timer-closed {
+  background-color: lighten($dark-grey-color2, 60%);
+  color: $dark-grey-color2;
+}
+
+//BID
+.button-refresh {
+  @include rem(margin, 0 1rem 0 0);
+  @include rem(font-size, 2rem);
+  font-family: "Font Awesome 6 Free";
+  background: transparent;
+  padding: 0;
+  color: var(--accent-color);
+  //border: 1px solid red;
+  &:hover {
+    color: var(--brand-color);
+    background: transparent;
+    background-color: transparent;
+    padding: 0;
+  }
+  &.is-active {
+    color: blue;
+  }
+}
+
+.c-lot-teaser__info-bottom form {
+  @include rem(margin, 1rem 0 0 0);
+  display: flex;
+  flex-wrap: wrap;
+
+  .form-item {
+    margin: 0.25rem 1rem 0.25rem 0;
+    width: 45%;
+    display: inline-block;
+    position: relative;
+
+    input {
+      @include rem(padding, 1.8rem 1rem);
+      margin-top: 2px;
+      width: 100%;
+      height: 2.2rem;
+      border-radius: 5px;
+      border: 1px solid lightgrey;
+    }
+
+    &::after {
+      @include rem(padding-right, 0.5rem);
+      content: "\e926";
+      font-family: "Material Icons";
+      position: absolute;
+      top: 25%;
+      right: 0;
+      color: var(--c-grey);
+    }
+  }
+
+  .button-bid {
+    display: inline-block;
+    background: $color-primary-2;
+
+    &:hover {
+      background: $color-primary-1;
+    }
+  }
+}
+
+.c-node {
+  .c-lot__meta {
+    @include rem(margin, 0 0 2rem 0);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    align-items: center;
+  }
+
+  .c-cta-lot {
+    h2 {
+      margin-top: 0;
+    }
+  }
+
+  .c-lot__detail {
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 40px;
+    background-color: #fff;
+    padding: 2rem;
+    position: relative;
+  }
+
+  h2 {
+    margin-top: 1.5rem;
+  }
+  .flag {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .image-zoom {
+    border-radius: 15px;
+  }
+
+  .form-item-bod {
+    display: inline-block;
+    width: auto;
+    position: relative;
+
+    input {
+      padding: 0.6rem;
+      margin-top: 2px;
+      width: 100%;
+      height: 2.2rem;
+      border-radius: 5px;
+      border: 1px solid lightgrey;
+      @include rem(padding, 1.8rem 1rem);
+    }
+    &::after {
+      @include rem(padding-right, 0.5rem);
+      content: "\e926";
+      font-family: "Material Icons";
+      position: absolute;
+      top: 25%;
+      right: 0;
+      color: var(--c-grey);
+    }
+  }
+}
+
+.bid,
+.highest_bidder {
+  @include rem(padding, 0.5rem 1rem);
+  @include rem(font-size, 1.3rem);
+  color: $color-black;
+  border-radius: 7px;
+  font-weight: 900;
+  position: relative;
+  width: 100%;
+  display: inline-block;
+}
+
+.no-highest_bidder {
+  @include rem(margin, 1rem 0 0 0);
+  background-color: lighten($dark-grey-color, 50%);
+}
+
+.highest_bidder {
+  @include rem(margin, 1rem 0 0 0);
+  background-color: lighten($brand-color-green, 50%);
+}
+
+.bid--success {
+  width: 100%;
+  @include rem(margin, 1rem 0 1rem 0);
+  background-color: lighten($brand-color-green, 50%);
+}
+
+.bid--error {
+  width: 100%;
+  @include rem(margin, 1rem 0 1rem 0);
+  background-color: lighten($brand-color, 50%);
+}
+
+// Favorites.
+.flag {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 3rem;
+  border-top-right-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ededed;
+
+  a {
+    text-align: center;
+    background-size: 100%;
+    height: 100%;
+    width: 20px;
+    display: inline-block;
+  }
+}
+
+.action-unflag {
+  background: var(--accent-color);
+}
+
+// FACETS
+.c-facet-block {
+  margin: 0 0 2rem 0;
+  padding: 0;
+
+  .c-facet-block__header {
+    h2 {
+      color: $dark-grey-color2;
+      margin: 0.35rem;
+    }
+  }
+
+  ul {
+    list-style: none;
+    margin-bottom: 0;
+  }
+
+  ul.js-facets-widget {
+    margin: 0 0 0 0.75rem;
+    li {
+      @include rem(padding, 0.05rem 0);
+    }
+  }
+
+  .facet-item__count {
+    @include rem(margin-right, 1rem);
+    @include rem(font-size, 1rem);
+  }
+  .facet-item input {
+    @include rem(margin-right, 0.5rem);
+  }
+}
+
+// PAGER
+.pager__items {
+  text-align: center;
+  margin-left: unset;
+
+  a {
+    color: black;
+  }
+}
+
+.u-reset-list {
+  margin: 0;
+  padding: 0;
+}
+
+.login-message {
+  @include rem(margin, 0.5rem 0);
+  display: inline-block;
+  width: 100%;
+  font-weight: 900;
+}
+
+// USER PROFILE
+.c-user-profile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem;
+  @include rem(margin, 1rem);
+
+  .c-user-profile-label {
+    min-width: 10%;
+    //color: $color-primary-3;
+    font-weight: 900;
+    //color: var(--brand-color);
+  }
+}
+
+// Webform
+.js-form-item-lot-select {
+  display: none;
+}
+
+ul.c_loten {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  width: 100%;
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+
+  li {
+    border-right: 1px solid black;
+    padding: 0 0.5rem;
+    width: 10%;
+    text-align: right;
+
+    &:first-child {
+      width: 5%;
+      text-align: left;
+    }
+
+    &:nth-child(2) {
+      width: 20%;
+      text-align: left;
+    }
+  }
+
+  &.c_loten_title {
+    font-weight: 900;
+    @include rem(margin-bottom, 2rem);
+  }
+
+  &.c_loten_data {
+    @include rem(margin-bottom, 0.25rem);
+  }
+}
+
+.c_proforma_user {
+  display: flex;
+  flex-flow: column wrap;
+  width: 40%;
+  float: right;
+}
+
+.c_proforma_info {
+  display: flex;
+  flex-flow: column wrap;
+  width: 40%;
+}
+
+ul.c_totals {
+  @include rem(margin, 4rem 0 0 0);
+  list-style: none;
+  width: 100%;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+.page-node-type-veiling .c-node__inner {
+  width: 90%;
+}
+
+.overzicht-hoogste-bieders-veiling {
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+    //border-bottom: 1px solid gray;
+    span {
+      width: 20%;
+    }
+
+    a {
+      width: 40%;
+
+      &.button {
+        width: auto;
+        height: auto;
+      }
+    }
+  }
+  a.button {
+    span {
+      display: inline-block;
+      background: $brand-color-blue;
+      @include rem(padding, 0.15rem 1rem);
+      color: white;
+      border-radius: 10px;
+      width: auto;
+      text-align: center;
+      cursor: pointer;
+    }
+    &.grey span {
+      background: grey;
+    }
+    &.red span {
+      background: var(--brand-color);
+    }
+    &.black span {
+      background: #000;
+    }
+    &:hover span {
+      background: $color-primary-2;
+    }
+  }
+}

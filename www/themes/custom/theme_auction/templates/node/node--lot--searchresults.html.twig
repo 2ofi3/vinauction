@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+{%
+    set classes = [
+    'c-lot-search-result',
+]
+%}
+{{ attach_library('classy/node') }}
+
+<div{{ attributes.addClass(classes) }}>
+    <div class="c-lot-search-result__cover">
+        <a href="{{ path('entity.node.canonical', {'node': node.id}) }}">{{ content.field_cover }}</a>
+    </div>
+    <div class="c-lot-search-result__content">
+        {{ content.field_p_lot_content }}
+        {{ content.field_appellation }} - {{ content.field_bottler }} - {{ content.field_year }}
+        <div class="c-lot-name"><a href="{{ path('entity.node.canonical', {'node': node.id}) }}">{{ 'Lees meer'|t }}</a></div>
+    </div>
+</div>

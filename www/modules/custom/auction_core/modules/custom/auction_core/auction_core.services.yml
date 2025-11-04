@@ -1,0 +1,21 @@
+services:
+  auction_core.offers:
+    class: Drupal\auction_core\Service\Offers
+    arguments: ['@entity_type.manager', '@database']
+
+  auction_core.timeline:
+    class: Drupal\auction_core\Service\Timeline
+    arguments: ['@database', '@lock', '@cache_tags.invalidator', '@datetime.time']
+
+  auction_core.bid_link:
+    class: Drupal\auction_core\Service\BidLinkBuilder
+    arguments: ['@entity_type.manager', '@router.builder', '@string_translation']
+
+  # ➕ Soft close: verleng actief lot + schuif volgende loten mee
+  auction_core.soft_close:
+    class: Drupal\auction_core\Service\SoftCloseManager
+    arguments:
+      - '@entity_type.manager'
+      - '@lock'
+      - '@datetime.time'
+      - '@cache_tags.invalidator'

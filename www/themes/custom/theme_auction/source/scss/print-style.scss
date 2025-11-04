@@ -1,0 +1,126 @@
+@charset "UTF-8";
+
+
+.c-page-logo {
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+.back-auction {
+  display: none;
+}
+
+body {
+  font-size: .65rem;
+  width: 100%;
+  display: block;
+  font-family: 'Roboto', sans-serif !important;
+}
+
+.c_loten_title {
+  font-family: 'Roboto', sans-serif !important;
+  margin-bottom: .25rem !important;
+}
+
+article {
+  display: block;
+  margin: 1rem 0;
+  clear: both;
+}
+
+ul.c_loten {
+  display: table;
+  table-layout: fixed;
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  margin: 0 0 2px 0;
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  font-family: 'Roboto', sans-serif;
+ 
+  li {
+    padding: 0.25rem;
+    margin: 0;
+    display: table-cell;
+    border-left: 1px solid black;
+    font-family: 'Roboto', sans-serif;
+    width: 7%;
+    text-align: right;
+    
+    &:first-child {
+      width: 3.5%;
+      text-align: left;
+    }
+    
+    &:nth-child(2) {
+      width: 22%;
+      text-align: left;
+    }
+    
+    &:nth-child(5),
+    &:nth-child(6){
+      width: 12%;
+    }
+    
+    &:nth-child(7),
+    &:nth-child(8){
+      width: 8%;
+    }
+  }
+}
+.c_bottom-top {
+  margin-top: 2rem;
+  text-align: center;
+  clear: both;
+}
+
+.c_bottom {
+  text-align: center;
+  color: #841233;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.country {
+  text-transform: uppercase;
+}
+
+.c_proforma_user {
+  display: table;
+  list-style: none;
+  margin: 0 0 2rem 0;
+  width: 40%;
+  float: right;
+  span {
+    width: 100%;
+    display: block;
+  }
+}
+
+.c_proforma_info {
+  display: table;
+  list-style: none;
+  margin: 0;
+  width: 50%;
+  float: left;
+  margin: 0 0 2rem 0;
+  span {
+    width: 100%;
+    display: block;
+  }
+}
+
+ul.c_totals {
+  width: 40%;
+  list-style: none;
+  padding: 0;
+  margin-top: 4rem;
+  float: right;
+}
+
+.c_bottom {
+  margin-top: 3rem;
+}

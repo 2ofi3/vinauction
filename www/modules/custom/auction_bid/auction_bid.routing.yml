@@ -1,0 +1,7 @@
+auction_bid.auction_submit:
+  path: 'bid-form-submit'
+  defaults:
+    _form:  '\Drupal\auction_bid\Form\AuctionSubmit'
+    _title: 'Auction Submit Form'
+  requirements:
+    _permission: 'access content'

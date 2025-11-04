@@ -1,0 +1,8 @@
+name: Auction Proforma
+type: module
+description: Auction proforma component
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:path_alias

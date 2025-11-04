@@ -1,0 +1,75 @@
+{#
+/**
+ * @file
+ * Theme override to display a single page.
+ *
+ * Regions:
+ * - page.content: The main content of the current page.
+ * - page.footer: Items for the footer region.
+ *
+ * @see template_preprocess_page()
+ * @see html.html.twig
+ */
+#}
+
+{% include '@theme_auction/_partials/header.html.twig' %}
+
+  <div class="c-search-container">
+    <div class="c-search">
+      {{ page.search }}
+    </div>
+  </div>
+  
+  <div class="c-top">
+    <div class="container">
+      <div class="c-top__inner">
+        <div class="o-grid">
+          <div class="o-grid__item u-1/1 u-1/2@tablet">
+            <div class="c-top-block c-top-block-left">
+              {%  if node.field_cal_title.value %}
+                <h2>{{ node.field_cal_title.value }}</h2>
+              {% endif %}
+              <div class="c-top-block__content">
+                <div class="c-calendar-widget">
+                  <div class="c-calendar-widget__days">{{ node.field_cal_days.value }}</div>
+                  <div class="c-calendar-widget__months">{{ node.field_cal_months.value }}</div>
+                  {% if node.field_cal_info.value %}
+                  {{ node.field_cal_info.value }}
+                  <div class="c-calendar-widget__info">{% endif %}</div>
+                  {% if node.field_cal_link.uri %}
+                    <div class="c-calendar-widget__info">{{ link(node.field_cal_link.title, node.field_cal_link.uri) }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="o-grid__item u-1/1 u-1/2@tablet">
+            <div class="c-top-block c-top-block-right">
+              <h2>{{ node.field_cta_title.value }}</h2>
+              <div class="c-top-block__content">
+                <div class="c-cta">
+                  <div class="c-cta__text">
+                    {{ node.field_cta_text.value }}
+                  </div>
+                  {{ link(node.field_cta_link.title, node.field_cta_link.uri, { 'class':['c-button']} ) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="container">
+  <div class="c-page-content">
+    <div class="c-page-content__inner">
+      {{ page.content }}
+    </div>
+  </div>
+  
+  <div class="c-subscribe">
+    {{ page.bottom }}
+  </div>
+</div>
+
+{% include '@theme_auction/_partials/footer.html.twig' %}

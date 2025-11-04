@@ -1,0 +1,19 @@
+<header id="header" class="c-header" role="banner" aria-label="{{ 'Site header'|t }}">
+  <div class="c-header__top" role="complementary">
+    <div class="container">
+      {{ page.header }}
+    </div>
+  </div>
+  <div class="container">
+    <div class="c-header__inner">
+      <a href="{{ front_page }}" class="c-page-logo">
+        <img src="{{ base_path ~ directory }}/img/vin-auction_logo.jpg" width="130" height="130" alt="Vin.Auction" />
+      </a>
+      
+      <div class="c-header__side">
+        {#{{ page.search }}#}
+        {{ page.menu }}
+      </div>
+    </div>
+  </div>
+</header>

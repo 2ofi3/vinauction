@@ -1,0 +1,196 @@
+# $Id$
+#
+# Nederlands translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  theme_auction.theme: n/a
+#  templates/node/node--lot--teaser.html.twig: n/a
+#  templates/node/node--lot.html.twig: n/a
+#  theme_auction.info.yml: n/a
+#  templates/_partials/footer.html.twig: n/a
+#  templates/_partials/header.html.twig: n/a
+#  templates/block/webform--newsletter.html.twig: n/a
+#  templates/layout/html.html.twig: n/a
+#  templates/layout/page--auction.html.twig: n/a
+#  templates/node/node--lot--bid.html.twig: n/a
+#  templates/node/node--lot--searchresults.html.twig: n/a
+#  templates/views/views-view--auctions.html.twig: n/a
+#  templates/views/views-view--zoeken.html.twig: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2022-11-15 11:29+0100\n"
+"PO-Revision-Date: 2022-11-15 11:29+0100\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Nederlands <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: theme_auction.theme:109
+msgid "Deze veiling (@auction_name) is afgelopen"
+msgstr ""
+
+#: theme_auction.theme:187
+msgid "Alle loten uit de veiling van @title"
+msgstr ""
+
+#: theme_auction.theme:237 templates/node/node--lot--teaser.html.twig:80 templates/node/node--lot.html.twig:75
+msgid "Inloggen om te bieden"
+msgstr ""
+
+#: theme_auction.theme:249
+msgid "Bieden"
+msgstr ""
+
+#: theme_auction.theme:323
+msgid "U dient hoger te bieden dan @highest_offer"
+msgstr ""
+
+#: theme_auction.theme:326
+msgid "U dient hoger te bieden dan @start_offer"
+msgstr ""
+
+#: theme_auction.theme:356
+msgid "U dient hoger te bieden dan @step"
+msgstr ""
+
+#: theme_auction.info.yml:0
+msgid "Auction"
+msgstr ""
+
+#: theme_auction.info.yml:0
+msgid "Auction custom theme"
+msgstr ""
+
+#: templates/_partials/footer.html.twig:6
+msgid "Contacteer ons"
+msgstr ""
+
+#: templates/_partials/footer.html.twig:24
+msgid "Volg ons op sociale media"
+msgstr ""
+
+#: templates/_partials/footer.html.twig:43
+msgid "Copyright 2022"
+msgstr ""
+
+#: templates/_partials/footer.html.twig:43
+msgid "Vin.auction - Angu bv"
+msgstr ""
+
+#: templates/_partials/header.html.twig:1
+msgid "Site header"
+msgstr ""
+
+#: templates/block/webform--newsletter.html.twig:26
+msgid "Interesse in wat Vin.auction nog in petto heeft?"
+msgstr ""
+
+#: templates/block/webform--newsletter.html.twig:27
+msgid "Kom het als eerste te weten!"
+msgstr ""
+
+#: templates/layout/html.html.twig:53
+msgid "Skip to main content"
+msgstr ""
+
+#: templates/layout/page--auction.html.twig:27
+msgid "PDF Downloaden"
+msgstr ""
+
+#: templates/layout/page--auction.html.twig:45
+msgid "Filter results"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:20
+msgid "Terug"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:28 templates/node/node--lot.html.twig:53
+msgid "Content"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:40;47;50 templates/node/node--lot--teaser.html.twig:51;58 templates/node/node--lot.html.twig:43;50
+msgid "Dit lot is afgesloten"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:41
+msgid "Bieden op dit lot eindigt binnen"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:43 templates/node/node--lot--teaser.html.twig:53 templates/node/node--lot.html.twig:45
+msgid "Bieden op dit lot eindigt op"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:44 templates/node/node--lot--teaser.html.twig:53 templates/node/node--lot.html.twig:45
+msgid "om"
+msgstr ""
+
+#: templates/node/node--lot--bid.html.twig:54 templates/node/node--lot--teaser.html.twig:68 templates/node/node--lot.html.twig:64
+msgid "Leading bid"
+msgstr ""
+
+#: templates/node/node--lot--searchresults.html.twig:23
+msgid "Lees meer"
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:37 templates/node/node--lot.html.twig:72
+msgid "Op dit lot is 21% aftrekbare BTW verschuldigd"
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:62 templates/node/node--lot.html.twig:57
+msgid "Schatting"
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:66 templates/node/node--lot.html.twig:62
+msgid "Bid"
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:70;87 templates/node/node--lot.html.twig:66
+msgid "No bids"
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:74 templates/node/node--lot.html.twig:70
+msgid "De koperscommissie bedraagt 17% bovenop de hamerprijs."
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:77
+msgid "You are the highest bidder"
+msgstr ""
+
+#: templates/node/node--lot--teaser.html.twig:83 templates/node/node--lot.html.twig:78
+msgid "Resultaat"
+msgstr ""
+
+#: templates/node/node--lot.html.twig:21
+msgid "Back to auction"
+msgstr ""
+
+#: templates/node/node--lot.html.twig:82
+msgid "Geen biedingen"
+msgstr ""
+
+#: templates/node/node--lot.html.twig:90
+msgid "Vragen over dit lot"
+msgstr ""
+
+#: templates/node/node--lot.html.twig:92
+msgid "Zit je met een vraag? Dat begrijpen wij helemaal. Onze experts beantwoorden al uw vragen."
+msgstr ""
+
+#: templates/node/node--lot.html.twig:94
+msgid "Stel u vraag"
+msgstr ""
+
+#: templates/views/views-view--auctions.html.twig:46
+msgid "Overview auctions"
+msgstr ""
+
+#: templates/views/views-view--zoeken.html.twig:46
+msgid "Zoeken"
+msgstr ""
+

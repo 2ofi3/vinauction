@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Theme override for the basic structure of a single Drupal page.
+ */
+#}
+{%
+  set body_classes = [
+    logged_in ? 'user-logged-in',
+    not root_path ? 'path-frontpage' : 'path-' ~ root_path|clean_class,
+    node_type ? 'page-node-type-' ~ node_type|clean_class,
+    db_offline ? 'db-offline',
+  ]
+%}
+<!DOCTYPE html>
+<html{{html_attributes}}>
+	<head>
+		{# De placeholders worden door Drupal gevuld met meta, CSS en JS (bovenaan) #}
+		<head-placeholder token="{{ placeholder_token }}">
+			<title>{{ head_title|safe_join(' | ') }}</title>
+			<css-placeholder token="{{ placeholder_token }}">
+				<js-placeholder token="{{ placeholder_token }}"></head>
+				<body{{attributes.addClass(body_classes)}}>
+					{# Accessibility: skiplink #}
+					<a href="#main-content" class="visually-hidden focusable skip-link">
+						{{ 'Skip to main content'|t }}
+					</a>
+
+					{{ page_top }}
+					{{ page }}
+					{{ page_bottom }}
+
+					{# JS onderaan de pagina (via libraries) #}
+					<js-bottom-placeholder token="{{ placeholder_token }}"></body>
+				</html>

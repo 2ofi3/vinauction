@@ -1,0 +1,98 @@
+diff --git a/core/lib/Drupal/Core/Config/Schema/ArrayElement.php b/core/lib/Drupal/Core/Config/Schema/ArrayElement.php
+index fed16db7d0a..98980ab819f 100644
+--- a/core/lib/Drupal/Core/Config/Schema/ArrayElement.php
++++ b/core/lib/Drupal/Core/Config/Schema/ArrayElement.php
+@@ -72,9 +72,7 @@ public function get($name) {
+     if (isset($element)) {
+       return $element;
+     }
+-    else {
+-      throw new \InvalidArgumentException("The configuration property $name doesn't exist.");
+-    }
++    throw new ConfigSchemaNoSuchPropertyException($name, "The configuration property $name doesn't exist.");
+   }
+ 
+   /**
+diff --git a/core/lib/Drupal/Core/Config/Schema/ConfigSchemaNoSuchPropertyException.php b/core/lib/Drupal/Core/Config/Schema/ConfigSchemaNoSuchPropertyException.php
+new file mode 100644
+index 00000000000..8741862a23d
+--- /dev/null
++++ b/core/lib/Drupal/Core/Config/Schema/ConfigSchemaNoSuchPropertyException.php
+@@ -0,0 +1,44 @@
++<?php
++
++namespace Drupal\Core\Config\Schema;
++
++/**
++ * The exception to raise when the config schema has no given property.
++ */
++class ConfigSchemaNoSuchPropertyException extends \InvalidArgumentException {
++
++  /**
++   * The name of a missing property.
++   *
++   * @var string
++   */
++  protected $property;
++
++  /**
++   * Constructs the exception.
++   *
++   * @param string $property
++   *   The name of a missing property.
++   * @param string $message
++   *   The exception message.
++   * @param int $code
++   *   The exception code.
++   * @param \Throwable|null $previous
++   *   The previous throwable used for the exception chaining.
++   */
++  public function __construct(string $property, string $message = '', int $code = 0, \Throwable $previous = NULL) {
++    parent::__construct($message, $code, $previous);
++    $this->property = $property;
++  }
++
++  /**
++   * Returns the name of a missing property.
++   *
++   * @return string
++   *   The name of a missing property.
++   */
++  public function getProperty(): string {
++    return $this->property;
++  }
++
++}
+diff --git a/core/lib/Drupal/Core/Config/StorableConfigBase.php b/core/lib/Drupal/Core/Config/StorableConfigBase.php
+index f3202a76444..b1472fb5480 100644
+--- a/core/lib/Drupal/Core/Config/StorableConfigBase.php
++++ b/core/lib/Drupal/Core/Config/StorableConfigBase.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\Core\Config;
+ 
++use Drupal\Core\Config\Schema\ConfigSchemaNoSuchPropertyException;
+ use Drupal\Core\Config\Schema\Ignore;
+ use Drupal\Core\Config\Schema\Mapping;
+ use Drupal\Core\Config\Schema\Sequence;
+@@ -178,11 +179,16 @@ protected function validateValue($key, $value) {
+    *   If the value is unsupported in configuration.
+    */
+   protected function castValue($key, $value) {
+-    $element = $this->getSchemaWrapper();
+-    if ($key !== NULL) {
+-      $element = $element->get($key);
++    try {
++      $element = $this->getSchemaWrapper();
++      if ($key !== NULL) {
++        $element = $element->get($key);
++      }
++    }
++    catch (ConfigSchemaNoSuchPropertyException $e) {
++      watchdog_exception("config:$this->name", $e);
++      $element = NULL;
+     }
+-
+     // Do not cast value if it is unknown or defined to be ignored.
+     if ($element && ($element instanceof Undefined || $element instanceof Ignore)) {
+       // Do validate the value (may throw UnsupportedDataTypeConfigException)

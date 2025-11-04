@@ -1,0 +1,15 @@
+diff --git search_api_sorts.info.yml search_api_sorts.info.yml
+index a8d552a..bdd03a0 100644
+--- search_api_sorts.info.yml
++++ search_api_sorts.info.yml
+@@ -1,7 +1,7 @@
+-name: 'Search API Sorts'
+-description: 'Create sort options for search queries executed via the Search API.'
++name: "Search API Sorts"
++description: "Create sort options for search queries executed via the Search API."
+ type: module
+ core_version_requirement: ^9.2 || ^10 || ^11
+ package: Search
+ dependencies:
+-  - search_api:search_api (>=1.16)
++  - search_api:search_api

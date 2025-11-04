@@ -1,0 +1,61 @@
+global-font:
+  remote: https://fonts.google.com/specimen/Open+Sans
+  version: 4.5.0
+  license:
+    name: OFL
+    url: http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web
+  css:
+    theme:
+      https://fonts.googleapis.com/css?family=Open+Sans:400,700: { type: external }
+
+font-awesome:
+  remote: https://kit.fontawesome.com/594cca7c8d.js
+  version: 6.2.0
+  license:
+    name: CC, OFL, MIT
+    url: https://fontawesome.com/license/free 
+  crossorigin: anonymous
+  js:
+    https://kit.fontawesome.com/594cca7c8d.js: { type: external, minified: true }
+
+# ➕ Material Icons voor <span class="material-icons">autorenew</span>
+material-icons:
+  remote: https://fonts.google.com/icons
+  version: 1.0.0
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  css:
+    theme:
+      https://fonts.googleapis.com/icon?family=Material+Icons: { type: external }
+
+global-css:
+  css:
+    theme:
+      lib/flexslider/flexslider.css: {}
+      lib/fancybox/jquery.fancybox.css: {}
+      css/main.css: {}
+      css/fix.css: {}
+
+global-js:
+  js:
+    lib/fancybox/jquery.fancybox.js: {}
+    js/main.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+
+# 🕐 Countdown library, enkel gebruikt op lot-templates
+auction.countdown:
+  js:
+    js/auction.countdown.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/jquery.once
+
+print-styling:
+  css:
+    theme:
+      css/print-style.css: {}

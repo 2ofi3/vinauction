@@ -1,0 +1,18 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ *
+ * @see template_preprocess_field()
+ */
+#}
+
+<div class="c-lot-images">
+{% for item in items %}
+ <a href="{{ item.content['#item'].entity.uri.value|image_style('detail') }}" data-fancybox="gallery">
+    {{ item.content }}
+  </a>
+{% endfor %}
+</div>
+
+

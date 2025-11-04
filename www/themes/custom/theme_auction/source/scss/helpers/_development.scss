@@ -1,0 +1,54 @@
+// sass-lint:disable-all
+// Breakpoint labels
+body.user-logged-in {
+  &::after {
+    display: block;
+    overflow: hidden;
+  }
+}
+
+@if $show-breakpoint-label {
+  body::after {
+    @include rem(font-size, 1.6rem);
+    content: 'default';
+    display: block;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 5px 10px;
+    color: white;
+    background: red;
+    height: auto;
+  }
+
+  @media (min-width: $break-1) {
+    body::after {
+      content: 'break 1 / 30em / 480px';
+      background: orange;
+    }
+  }
+  @media (min-width: $break-2) {
+    body::after {
+      content: 'break 2 / 42.5em / 680px';
+      background: green;
+    }
+  }
+  @media (min-width: $break-3) {
+    body::after {
+      content: 'break 3 / 60em / 960px';
+      background: teal;
+    }
+  }
+  @media (min-width: $break-4) {
+    body::after {
+      content: 'break 4 / 72em / 1152px';
+      background: purple;
+    }
+  }
+  /*@media (min-width: $break-5) {
+    body:after {
+      content: "break 5 / 81.25em / 1400px";
+      background: blue;
+    }
+  }*/
+}

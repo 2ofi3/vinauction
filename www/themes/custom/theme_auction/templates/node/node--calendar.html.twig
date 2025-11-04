@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+{%
+    set classes = [
+    'c-node',
+]
+%}
+{{ attach_library('classy/node') }}
+
+{{ content.field_hero }}
+
+<article{{ attributes.addClass(classes) }}>
+    <div class="c-node__inner">
+        <h2{{ title_attributes }}>
+            {{ label }}
+        </h2>
+        {{ content|without('field_hero') }}
+    </div>
+</article>

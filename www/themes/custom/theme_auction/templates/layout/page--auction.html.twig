@@ -1,0 +1,60 @@
+{#
+/**
+ * @file
+ * Theme override to display a single page.
+ *
+ * Regions:
+ * - page.content: The main content of the current page.
+ * - page.footer: Items for the footer region.
+ *
+ * @see template_preprocess_page()
+ * @see html.html.twig
+ */
+#}
+
+{% include '@theme_auction/_partials/header.html.twig' %}
+
+<div class="container">
+  <div class="c-auction">
+    <h1>{{ title }}</h1>
+
+    <div class="c-auction-actions">
+      <div class="c-auction-number">
+        {# {{ goto_form }} #}
+      </div>
+      <div class="c-auction-pdf">
+        {% if pdf_uri is not empty %}
+          <a href="{{ file_url(pdf_uri) }}" target="_blank" class="c-button">{{ 'PDF Downloaden'|t  }}</a>
+        {% endif %}
+      </div>
+    </div>
+
+ {#   {% if page.filter %}
+    <header class="c-auction__header">
+      <div class="c-top-filters">
+        {{ page.filter }}
+      </div>
+    </header>
+    {% endif %}#}
+
+    <div class="o-grid">
+      {% if page.left %}
+        <div class="o-grid__item u-1/1 u-3/12@laptop u-3/12@desktop">
+          <div class="c-auction__side">
+            <div class="c-auction-filter">
+              <button class="c-auction-filter__toggle js-toggle-auction-filters">{{ 'Filter results'|t }}</button>
+              <div class="c-auction-filter__content js-auction-filters">
+                {{ page.left }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      <div class="o-grid__item u-1/1 u-9/12@laptop u-9/12@desktop">
+        {{ page.content }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include '@theme_auction/_partials/footer.html.twig' %}

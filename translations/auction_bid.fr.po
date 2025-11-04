@@ -1,0 +1,58 @@
+# $Id$
+#
+# Frans translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  auction_bid.info.yml: n/a
+#  auction_bid.routing.yml: n/a
+#  src/Form/AuctionSubmit.php: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2022-11-15 11:59+0100\n"
+"PO-Revision-Date: 2022-11-15 11:59+0100\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Frans <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: auction_bid.info.yml:0
+msgid "Auction Bid"
+msgstr ""
+
+#: auction_bid.info.yml:0
+msgid "Auction bidding components"
+msgstr ""
+
+#: auction_bid.info.yml:0
+msgid "Custom"
+msgstr "Personnalisé"
+
+#: auction_bid.routing.yml:0
+msgid "Auction Submit Form"
+msgstr ""
+
+#: src/Form/AuctionSubmit.php:70
+msgid "Bid"
+msgstr "Offrir"
+
+#: src/Form/AuctionSubmit.php:98
+msgid "Geef een geldig bod in."
+msgstr "Entrez une enchère valide."
+
+#: src/Form/AuctionSubmit.php:117
+msgid "Uw bod is te laag.<br />Openingsbod is minimaal € @starting ."
+msgstr "Votre offre est insuffisant<br />"
+
+#: src/Form/AuctionSubmit.php:141
+msgid "U dient hoger te bieden dan € @step."
+msgstr "Vous devez enchérir plus que € @step."
+
+#: src/Form/AuctionSubmit.php:180
+msgid "Uw bod is te laag. Biedt hoger dan € @highestbid ."
+msgstr "Votre offre est insuffisant, veuillez offrir plus que € @highestbid ."
+

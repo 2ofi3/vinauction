@@ -1,0 +1,17 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+{%
+  set classes = [
+    'c-auction-teaser',
+  ]
+%}
+{{ attach_library('classy/node') }}
+<article{{ attributes.addClass(classes) }}>
+  <a href="{{ auction_path }}">{{ label }}</a>
+</article>

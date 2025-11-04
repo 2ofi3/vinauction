@@ -1,0 +1,321 @@
+<?php
+
+use Drupal\node\NodeInterface;
+use Drupal\Component\Utility\Html;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\node\Entity\Node;
+use Drupal\webform\WebformSubmissionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\Component\Utility\SafeMarkup;
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function auction_proforma_preprocess_node(&$variables)
+{
+  $node = $variables['node'];
+  $type = $node->getType();
+  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $variables['uid'] = \Drupal::currentUser()->id();
+
+
+  //AUCTION
+  if ($type == 'veiling') {
+    // Auction entity
+    $auction_id = $node->id();
+    $query = \Drupal::entityQuery('node');
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $query = $node_storage->getQuery()
+      ->condition('type', 'proforma')
+      ->condition('status', 1)
+      //->sort('field_lot_nr', 'ASC')
+      //->order('0, 1')
+      ->condition('field_veiling', $auction_id, '=');
+
+    $values = [];
+    $nids = $query->execute();
+    $nodes = $node_storage->loadMultiple($nids);
+
+    $date_formatter = \Drupal::service('date.formatter');
+    $auction_date = $node->field_einddatum->date->format('d-m-Y');
+
+    foreach ($nodes as $key => $node) {
+      //MAILING
+      $form = \Drupal::classResolver()->getInstanceFromDefinition('Drupal\auction_proforma\Form\MailtoForm');
+      $form->proforma_id = $node->id();
+      $form->auction_id = $auction_id;
+      $form->auction_date = $auction_date;
+      $form->user_reference_lastname = $node->get('field_bieder')->referencedEntities()[0]->field_lastname->value;
+      $form->user_reference_firstname = $node->get('field_bieder')->referencedEntities()[0]->field_firstname->value;
+      $form->user_reference_mail = $node->get('field_bieder')->referencedEntities()[0]->mail->value;
+      $form->user_lang = $node->get('field_bieder')->referencedEntities()[0]->langcode->value;
+      $form = \Drupal::formBuilder()->getForm($form); /* inside getForm() replace the namespace with your custom form */
+
+      $values[$key]['bieder_id'] = $node->get('field_bieder')->referencedEntities()[0]->id();
+      $values[$key]['bieder_lastname'] = $node->get('field_bieder')->referencedEntities()[0]->field_lastname->value;
+      $values[$key]['bieder_firstname'] = $node->get('field_bieder')->referencedEntities()[0]->field_firstname->value;
+      $values[$key]['bieder_langcode'] = $node->get('field_bieder')->referencedEntities()[0]->langcode->value;
+
+      // MAILING
+      $values[$key]['proforma_id'] = $node->id();
+      $values[$key]['mailing_form'] = $form;
+      if (isset($node->field_invoice_number->value)) {
+        $values[$key]['invoice_id'] = $node->field_invoice_number->value;
+      }
+    }
+
+    // Variables
+    $variables['loten'] = $values;
+  }
+
+  // PROFORMA
+  if ($type == 'proforma' && $variables['view_mode'] = 'default') {
+    // Auction entity
+    $auction_reference_id = $node->get('field_veiling')->first()->getValue()['target_id'];
+    $auction_reference = $node->get('field_veiling')->referencedEntities()[0]->field_einddatum->value;
+    $invoice_number = $node->field_invoice_number->value;
+
+    if (isset($invoice_insurance)) {
+      $variable['invoice_insurance'] = $invoice_insurance;
+    }
+
+    if ($node->field_insurance->value) {
+      $number_insurance = $node->field_insurance->value;
+      $insurance = $number_insurance;
+    } else {
+      $insurance = "0";
+    }
+
+    if ($node->field_transport_cost->value) {
+      $number_transport = $node->field_transport_cost->value;
+      $transport = $number_transport;
+    } else {
+      $transport = "0";
+    }
+
+    // User entity
+    $user_reference_id = $node->get('field_bieder')->first()->getValue()['target_id'];
+    $user_reference_first_name = $node->get('field_bieder')->referencedEntities()[0]->field_firstname->value;
+    $user_reference_last_name = $node->get('field_bieder')->referencedEntities()[0]->field_lastname->value;
+    $user_reference_addresse = $node->get('field_bieder')->referencedEntities()[0]->field_address->value;
+    $user_reference_postal = $node->get('field_bieder')->referencedEntities()[0]->field_postal->value;
+    $user_reference_city = $node->get('field_bieder')->referencedEntities()[0]->field_city->value;
+    $user_reference_country = $node->get('field_bieder')->referencedEntities()[0]->field_country->value;
+    $user_reference_vat = $node->get('field_bieder')->referencedEntities()[0]->field_vat->value;
+    $user_reference_special_btw = $node->get('field_bieder')->referencedEntities()[0]->field_btw_speciaal_geval->value;
+    $user_reference_special_btw_tarieven = $node->get('field_bieder')->referencedEntities()[0]->field_btw_tarieven->value;
+    $user_reference_company = $node->get('field_bieder')->referencedEntities()[0]->field_company->value;
+    $user_reference_intracommunautair = $node->get('field_bieder')->referencedEntities()[0]->field__intracommunautair->value;
+    $user_reference_export = $node->get('field_bieder')->referencedEntities()[0]->field_export->value;
+
+
+    // Query loten
+    $query = \Drupal::entityQuery('node');
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $query = $node_storage->getQuery()
+      ->condition('type', 'lot')
+      ->condition('status', 1)
+      ->condition('field_highest_bid_user', $user_reference_id, '=')
+      ->condition('field_auction_reference', $auction_reference_id, '=');
+
+    $values = [];
+    $nids = $query->execute();
+    $nodes = $node_storage->loadMultiple($nids);
+
+    // Calculate all prices
+    $sum = 0;
+    $sum_hamerprijs = 0;
+    $sum_commissie = 0;
+    $sum_btw_only = 0;
+
+    // Date Now
+    $date_now = new DrupalDateTime('now');
+
+    // Prepare for field value
+    $date_formatter = \Drupal::service('date.formatter');
+    $date = $date_formatter->format($date_now->getTimestamp(), 'custom', 'd-m-Y');
+
+    foreach ($nodes as $key => $node) {
+      $values[$key]['lot_title'] = $node->get('title')->value;
+      $values[$key]['lot_nr'] = $node->get('field_lot_nr')->value;
+      $values[$key]['lot_highest_bid'] = $node->get('field_highest_bid')->value;
+
+      // Commissie
+      if ($node->get('field_btw_verschuldigd')->value == 1) {
+        $bid = $node->get('field_highest_bid')->value;
+        $tarief = $user_reference_special_btw_tarieven;
+        $commissie = ($bid / 100 * 14.88);
+        $total_with_btw = ($bid + $commissie) + (($bid + $commissie) / 100 * $tarief);
+        $values[$key]['lot_commissie'] = $commissie;
+        $values[$key]['lot_commissie_percentage'] = '14.88%';
+        $values[$key]['lot_total_btw'] = $total_with_btw;
+        $values[$key]['lot_total_btw_only'] = (($bid + $commissie) / 100 * $tarief);
+        $values[$key]['lot_total'] = $total_with_btw;
+      } else {
+        if ($user_reference_special_btw == '1') {
+          $values[$key]['lot_commissie'] = $node->get('field_highest_bid')->value / 100 * 14.88;
+          $values[$key]['lot_commissie_percentage'] = '14,88%';
+          $values[$key]['lot_total_btw'] = $node->get('field_highest_bid')->value + ($node->get('field_highest_bid')->value / 100 * 14.88);
+          $values[$key]['lot_total_btw_only'] = 0;
+          $values[$key]['lot_total'] = $node->get('field_highest_bid')->value + ($node->get('field_highest_bid')->value / 100 * 14.88);
+        } else {
+          $values[$key]['lot_commissie'] = $node->get('field_highest_bid')->value / 100 * 18;
+          $values[$key]['lot_commissie_percentage'] = '18%';
+          $values[$key]['lot_total_btw'] = $node->get('field_highest_bid')->value + ($node->get('field_highest_bid')->value / 100 * 18);
+          $values[$key]['lot_total_btw_only'] = 0;
+          $values[$key]['lot_total'] = $node->get('field_highest_bid')->value + ($node->get('field_highest_bid')->value / 100 * 18);
+        }
+      }
+
+      $values[$key]['lot_year'] = $node->get('field_year')->referencedEntities()[0]->label();
+      $values[$key]['lot_wine'] = $node->get('field_p_lot_content')->referencedEntities()[0]->field_lot_title->value;
+      $values[$key]['lot_size'] = $node->get('field_p_lot_content')->referencedEntities()[0]->field_lot_bottle_amount->value;
+      $values[$key]['lot_btw'] = $node->get('field_btw_verschuldigd')->value;
+
+      // Calculate all prices
+      $sum_btw_only += $values[$key]['lot_total_btw_only'];
+      $sum_hamerprijs += $values[$key]['lot_highest_bid'];
+      $sum_commissie += $values[$key]['lot_commissie'];
+      $sum += $values[$key]['lot_total_btw'];
+      $all = ($sum + $insurance + $transport);
+    }
+
+    // Variables to twig
+    $variables['lot_total_all'] = $all;
+    $variables['lot_total_hamerprijs'] = $sum_hamerprijs;
+    $variables['lot_total_commissie'] = $sum_commissie;
+    $variables['lot_total_btw'] = $sum_btw_only;
+    $variables['loten'] = $values;
+    $variables['proforma_id'] = $variables['node']->id();
+    $variables['auction_reference'] = $auction_reference_id;
+    $variables['auction_reference_date'] = $auction_reference;
+    $variables['user_reference'] = $user_reference_id;
+    $variables['date_now'] = $date;
+    $variables['user_reference_first_name'] = ucfirst(strtolower($user_reference_first_name));
+    $variables['user_reference_last_name'] = ucfirst(strtolower($user_reference_last_name));
+    $variables['user_reference_addresse'] = ucfirst(strtolower($user_reference_addresse));
+    $variables['user_reference_postal'] = ucfirst(strtolower($user_reference_postal));
+    $variables['user_reference_city'] = ucfirst(strtolower($user_reference_city));
+    $variables['user_reference_country'] = ucfirst(strtolower($user_reference_country));
+    $variables['user_reference_vat'] = $user_reference_vat;
+    $variables['user_reference_vat_tarief'] = $user_reference_special_btw_tarieven;
+    $variables['user_reference_company'] = $user_reference_company;
+    $variables['user_reference_intracommunautair'] = $user_reference_intracommunautair;
+    $variables['user_reference_export'] = $user_reference_export;
+
+    if (isset($invoice_number)) {
+      $variables['proforma_invoice'] = $invoice_number;
+    }
+  }
+}
+
+function auction_proforma_entity_print_saver($nid, $filename, $scheme = 'private')
+{
+  $pb = new Drupal\entity_print\PrintBuilder(
+    \Drupal::service('entity_print.renderer_factory'),
+    \Drupal::service('event_dispatcher'),
+    \Drupal::service('string_translation')
+  );
+
+  $node = Drupal\node\Entity\Node::load($nid);
+  $path = $pb->savePrintable(
+    [$node],
+    \Drupal::service('plugin.manager.entity_print.print_engine')->createSelectedInstance('pdf'),
+    $scheme,
+    $filename
+  );
+
+  $file = File::create([
+    'uri' => $path,
+    'uid' => \Drupal::currentUser()->id(),
+    'status' => FILE_STATUS_PERMANENT,
+  ]);
+  $file->save();
+  return $file;
+}
+
+/**
+ * Implements hook_mail()
+ *
+ * @param $key
+ * @param $message
+ * @param $params
+ */
+
+function auction_proforma_mail($key, &$message, $params)
+{
+  switch ($key) {
+    case 'mail_proforma':
+      $options = array(
+        'langcode' => $message['langcode'],
+      );
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+      $message['headers']['BCC'] = 'info@vin.auction';
+      switch ($message['langcode']) {
+        case 'nl':
+          $subject = "U wint! veiling {$params['auction_date']}...loten voor u...proforma factuur in bijlage";
+          $body = "<p>Dag {$params['user_firstname']},</p>
+          <p>Dank voor deelname aan onze veiling!</p>
+          <p><a href='https://vin.auction/print/pdf/node/{$params['proforma_id']}'>U kan uw proforma van de loten die u zijn toegewezen hier downloaden.</a>
+          <p style='border:1px solid #000000; padding: 20px; width: auto; display: inline-block'>
+          &rarr; Gelieve het bedrag over te schrijven op het rekeningnummer <strong> BE66 6451 0371 3243 </strong> <br />
+            Met mededeling: <strong>loten veiling {$params['auction_date']} {$params['user_firstname']} {$params['user_lastname']}</strong>
+          </p>
+          <p>Alvast dank, fijne dag verder en tot binnenkort.</p>
+          <p>Vriendelijke groeten,</p>
+          <p>Gunther Methot</p>
+          <p><a href='https://vin.auction'>
+            <img src='https://vin.auction/themes/custom/theme_auction/img/vin-auction_logo.jpg' width='150' height='150' alt='Vin.Auction' />
+          </a></p>";
+
+          break;
+        case 'fr':
+          $subject = "Vous gagnez! vente {$params['auction_date']}... lot(s) pour vous...facture proforma en annexe";
+          $body = "<p>Bonjour {$params['user_firstname']},</p>
+          <p>Merci pour votre participation à notre vente!</p>
+          <p><a href='https://vin.auction/print/pdf/node/{$params['proforma_id']}'>Vous pouvez télécharger ici la facture proforma des lots qui sont pour vous.</a>
+          <p style='border:1px solid #000000; padding: 20px; width: auto; display: inline-block'>
+          &rarr; Veillez verser le montant sur le compte <strong> BE66 6451 0371 3243 </strong><br />
+            avec le message: <strong> lots vente {$params['auction_date']} {$params['user_firstname']} {$params['user_lastname']}</strong>
+          </p>
+          <p>Quand le paiment est chez nous, on peut arranger la collection / envoi des bouteilles.</p>
+          <p>Merci d’avance, bonne journée et à bientôt</p>
+          <p>Cordialement</p>
+          <p>Gunther Methot</p>
+          <p><a href='https://vin.auction'>
+            <img src='https://vin.auction/themes/custom/theme_auction/img/vin-auction_logo.jpg' width='150' height='150' alt='Vin.Auction' />
+          </a></p>";
+          break;
+        case 'en':
+        default:
+          $subject = "You won! auction {$params['auction_date']}... lots for you...proforma invoice in attachment";
+          $body = "<p>Hello {$params['user_firstname']},</p>
+          <p>Many thanks for your participation at our auction!</p>
+          <p><a href='https://vin.auction/print/pdf/node/{$params['proforma_id']}'>You can download here the proforma invoice of your won lots.</a>
+          <p style='border:1px solid #000000; padding: 20px; width: auto; display: inline-block'>
+          &rarr; Please pay the amount on our bank account <strong> BE66 6451 0371 3243 </strong> <br />
+            with following message: <strong>lots auction {$params['auction_date']} {$params['user_firstname']} {$params['user_lastname']}</strong>
+          </p>
+          <p>Once payment is arrived we can ship the bottles to your address.</p>
+          <p>Many thanks in advance, have a nice day.</p>
+          <p>Friendly Regards</p>
+          <p>Gunther Methot</p>
+          <p><a href='https://vin.auction'>
+            <img src='https://vin.auction/themes/custom/theme_auction/img/vin-auction_logo.jpg' width='150' height='150' alt='Vin.Auction' />
+          </a></p>";
+          break;
+      }
+      $body = \Drupal\Core\Render\Markup::create($body);
+      $message['subject'] = $subject;
+      $message['body'][] = $body;
+
+      \Drupal::messenger()->addMessage('Mail Verzonden naar ' . $params['user_mail']);
+
+      break;
+  }
+}

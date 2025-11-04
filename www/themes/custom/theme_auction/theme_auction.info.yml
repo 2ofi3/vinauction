@@ -1,0 +1,31 @@
+name: Auction
+description: 'Auction custom theme'
+type: theme
+base theme: classy
+package: 'Entity Print'
+core_version_requirement: ^9 || ^10 || ^11
+
+# Laad je themalibraries. Volgorde: fonts -> css -> js -> extra iconset -> countdown
+libraries:
+  - theme_auction/global-font
+  - theme_auction/global-css
+  - theme_auction/global-js
+  - theme_auction/font-awesome
+  - theme_auction/material-icons
+  - theme_auction/auction.countdown
+
+# Regio's blijven zoals je ze nu gebruikt
+regions:
+  header: 'Header'
+  filter: 'Filter'
+  menu: 'Menu'
+  search: 'Search'
+  left: 'Left'
+  content: 'Content'
+  bottom: 'Bottom'
+  empty: 'Empty'
+
+# Entity Print integratie (PDF stylesheet)
+entity_print:
+  node:
+    all: 'theme_auction/print-styling'

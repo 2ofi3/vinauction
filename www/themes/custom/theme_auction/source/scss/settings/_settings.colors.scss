@@ -1,0 +1,104 @@
+///* ========================================================================
+//   #COLORS
+//   ======================================================================== */
+//NEW COLORS
+:root {
+    --brand-color: #841233;
+    --accent-color: #1abd8d;
+    --c-white: #fff;
+    --c-black: #000;
+    --c-grey: #7e7e7e;
+}
+
+// DEFAULT
+$white-color: #fff;
+$black-color: #000;
+$dark-grey-color: #7e7e7e;
+$dark-grey-color2: #333333;
+$grey-color: #c7c7c7;
+$light-grey-color: #f8f8f8;
+$base-ui-color: #fbfbfb;
+
+// OLD COLORS
+$brand-color: #841233;
+$accent-color: $brand-color;
+$accent-color2: #072b30;
+$brand-color-dark: #1a9cbd;
+$brand-color-blue: #1abd8d;
+$brand-color-green: #4c9141;
+
+// Colors from design
+$color-primary-1: $brand-color;
+$color-primary-2: #bd1a4a;
+$color-primary-3: rgba(58, 74, 51, 1);
+$color-primary-4: rgba(199, 142, 10, 1);
+$color-primary-1-85: rgba(169, 79, 43, .85);
+$color-primary-2-85: rgba(84, 56, 71, .85);
+$color-primary-3-85: rgba(58, 74, 51, .85);
+$color-primary-4-85: rgba(199, 142, 10, .85);
+
+//grey
+$color-grey-a500: #2d2e34;
+$color-grey-100: #f8f7f8;
+$color-grey-200: #f1f2f3;
+$color-grey-300: #e3e5e7;
+$color-grey-400: #dcdcdc;
+$color-grey-500: #2d2e34;
+$color-grey: $color-grey-500;
+$color-grey-600: #aeb0b6;
+$color-grey-700: #9097a0;
+$color-grey-800: #869791;
+$color-grey-900: #474b50;
+
+//black and white
+$color-white: #fff;
+$color-black: #000;
+$color-grey-a: #fafafa;
+$c-white: $color-white;
+
+//specials
+$transparent-black-00: transparentize($color-black, 1);
+$transparent-black-05: transparentize($color-black, .95);
+$transparent-black-10: transparentize($color-black, .9);
+$transparent-black-15: transparentize($color-black, .85);
+$transparent-black-20: transparentize($color-black, .8);
+$transparent-black-25: transparentize($color-black, .75);
+$transparent-black-30: transparentize($color-black, .7);
+$transparent-black-40: transparentize($color-black, .6);
+$transparent-black-50: transparentize($color-black, .5);
+$transparent-black-60: transparentize($color-black, .4);
+$transparent-black-70: transparentize($color-black, .3);
+$transparent-black-75: transparentize($color-black, .25);
+$transparent-black-80: transparentize($color-black, .2);
+$transparent-black-90: transparentize($color-black, .1);
+$transparent-black-95: transparentize($color-black, .05);
+
+$transparent-white-00: transparentize($color-white, 1);
+$transparent-white-15: transparentize($color-white, .85);
+$transparent-white-25: transparentize($color-white, .75);
+$transparent-white-50: transparentize($color-white, .5);
+$transparent-white-75: transparentize($color-white, .25);
+
+
+// Messages
+$color-info: #08a;
+$color-succes: #04a373;
+$color-error: #d00;
+$color-warning: #d78100;
+
+// Environment
+$color-lcl: #04a373;
+$color-ldv: #08a;
+$color-abt: #0baeb0;
+$color-cbt: #d78100;
+$color-prd: #d00;
+
+$color-breadcrumb-link: $color-primary-1;
+$color-body: #293340;
+$color-link: $color-primary-1;
+$slidingpop: $color-primary-2;
+$slidingpop-link: $color-primary-1;
+$footer-bottom: #37383E;
+$table-border: #d8d7d8;
+$table-color: #4d4d4d;
+$table-border-tr: #ededed;

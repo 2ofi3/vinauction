@@ -1,0 +1,9 @@
+
+module_auction_view.goto_form:
+  path: '/module_auction_view/form/goto'
+  defaults:
+    _form: '\Drupal\module_auction_view\Form\GotoForm'
+    _title: 'GotoForm'
+  requirements:
+    _access: 'TRUE'
+  

@@ -1,0 +1,37 @@
+
+{%
+set classes = [
+  'c-node',
+]
+%}
+{{ attach_library('classy/node') }}
+
+<article{{ attributes.addClass(classes) }}>
+  <a class="button" href="{{ path('node.add', {'node_type' : 'proforma'}) }}">
+    {{ 'Maak een proforma manueel aan'|t }}
+  </a>
+  <h2>Proforma's: {{ label }}</h2>
+  <div class="c-node__inner">
+    {{ content|without('field_catalog', 'field_einddatum', 'field_auction_date','field_auction_status', 'field_proforma_aanmaken' ) }}
+    <div class="overzicht-hoogste-bieders-veiling">
+      <ul>
+      {% for row in loten|sort((a, b) => a.bieder_lastname <=> b.bieder_lastname) %}
+        <li>
+          {% if row.invoice_id   %} 
+            <span>{{ row.bieder_langcode }} - {{ 'Invoice:'|t }} {{ row.invoice_id }}</span> <a href="/print/pdf/node/{{ row.proforma_id }}">{{ row.bieder_lastname}} {{ row.bieder_firstname}} - {{ row.proforma_id }}</a>
+          {% else %}
+            <span>{{ row.bieder_langcode }} - {{ 'Proforma:'|t }}</span> <a href="/print/pdf/node/{{ row.proforma_id }}">{{ row.bieder_lastname}} {{ row.bieder_firstname}} - {{ row.proforma_id }}</a>
+          {% endif %}
+          <a class="button grey" href="/nl/user/{{ row.bieder_id }}/edit">
+            <span>{{ 'Edit user'|t }}</span>
+          </a>
+          <a class="button" href="/nl/node/{{ row.proforma_id }}/edit">
+            <span>{{ 'Edit proforma'|t }}</span>
+          </a>
+          {{ row.mailing_form }}
+        </li>
+      {% endfor %} 
+      </ul>
+    </div>
+  </div>
+</article>

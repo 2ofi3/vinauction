@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains auction_commands.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function auction_commands_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the auction_commands module.
+    case 'help.page.auction_commands':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Custom Drush commands for auction') . '</p>';
+      return $output;
+
+    default:
+  }
+}

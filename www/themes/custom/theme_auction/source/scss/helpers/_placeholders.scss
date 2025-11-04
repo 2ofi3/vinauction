@@ -1,0 +1,97 @@
+// PLACEHOLDERS.SCSS
+@import 'settings/settings.colors';
+
+// Hidden elements
+%element-invisible {
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px 1px 1px 1px);
+}
+
+// Break out background color
+%break {
+  padding: 0 100vw;
+  margin: 0 -100vw;
+}
+
+// Placeholders
+%placeholder {
+  color: $color-grey-300;
+}
+
+%margin-bottom {
+  margin-bottom: 1em;
+}
+
+// Toggle
+%toggle {
+  h2 {
+    cursor: pointer;
+    margin: 0;
+    position: relative;
+  }
+
+  ul {
+    display: none;
+  }
+
+  li {
+    display: block;
+  }
+
+  a {
+    display: block;
+  }
+}
+
+// Flexbox
+%flexbox {
+  @include flexbox;
+  @include flex-flow(row wrap);
+  @include align-content(center);
+}
+
+// Flexbox middle
+%flexbox-middle {
+  @include flexbox;
+  @include flex-flow(row wrap);
+  @include align-content(center);
+  @include align-items(center);
+  @include justify-content(center);
+}
+
+// Flexbox middle
+%flexbox-center {
+  @include flexbox;
+  @include flex-flow(row wrap);
+  @include align-content(center);
+  @include align-items(center);
+}
+
+%grid {
+  display: grid;
+}
+
+// Align to the right (Float: right)
+%align-right {
+  margin-left: auto;
+}
+
+// Disable Contextual-links
+%display-none {
+  display: none;
+}
+
+%container {
+  margin: 0 auto;
+  padding: 0 1rem;
+  max-width: 1300px;
+
+  &::after {
+    clear: both;
+    content: ' ';
+    display: block;
+  }
+}

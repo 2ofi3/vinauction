@@ -1,0 +1,148 @@
+{# node--lot--teaser.html.twig #}
+{{ attach_library('theme_auction/material-icons') }}
+
+{# ===================== KLASSEN ===================== #}
+{% set classes = [] %}
+{% if logged_in and (node.field_highest_bid_user.target_id ?? 0) == uid %}
+	{% set classes = classes|merge(['highest-bid']) %}
+{% endif %}
+
+{# ===================== TIMESTAMPS (uit preprocess) ===================== #}
+{% set end_ts = lot_end_ts ?? null %}
+{% set server_now = server_now_ts ?? null %}
+
+{# (extra veilig) countdown-library aanhaken #}
+{{ attach_library('theme_auction/auction.countdown') }}
+
+<article{{attributes.addClass(classes)}} id="node-{{ node.id }}">
+	<div
+		class="c-lot-teaser">
+
+		{# ===================== BOVENSTE BLOK ===================== #}
+		<div class="c-lot-teaser__info-top">
+			<div class="c-lot-teaser__cover">
+				<a href="{{ path('entity.node.canonical', {'node': node.id}) }}">
+					{{ content.field_cover }}
+				</a>
+			</div>
+
+			<div class="c-lot-teaser__info">
+				<h3 class="c-lot-name">
+					<a href="{{ path('entity.node.canonical', {'node': node.id}) }}">
+						{{ label }}
+						{% if node.field_btw_verschuldigd.value is not empty and node.field_btw_verschuldigd.value == '1' %}
+							–
+							{{ 'VAT lot'|t }}
+						{% endif %}
+					</a>
+				</h3>
+
+				<div class="c-lot-meta">
+					{{ content.field_appellation }}
+					{{ content.field_bottler }}
+				</div>
+
+				<div class="c-lot-content">
+					{{ content.field_p_lot_content }}
+				</div>
+			</div>
+
+			{% if logged_in %}
+				<div class="c-lot-favorite">
+					{{ content.flag_flag_favorite }}
+				</div>
+			{% endif %}
+		</div>
+
+		{# ===================== MIDDENBLOK: countdown ===================== #}
+		<div class="c-lot-teaser__info-middle">
+			{% if end_ts and server_now < end_ts %}
+				<div class="c-lot-counter-wrapper">
+					<div class="c-lot-teaser__enddate">
+						<span class="end-label">
+							{{ 'Bieden op dit lot eindigt op'|t }}
+							{{ end_ts|format_date('custom', 'd/m') }}
+							{{ 'om'|t }}
+							{{ end_ts|format_date('custom', 'H:i:s') }}
+						</span>
+					</div>
+
+					<div class="c-lot-counter c-lot-timer" data-end-ts="{{ end_ts }}" data-server-now="{{ server_now }}">
+						<span class="js-countdown" aria-live="polite">
+							{{ end_ts|format_date('custom', 'H:i:s') }}
+						</span>
+						<noscript>{{ end_ts|format_date('custom', 'H:i:s') }}</noscript>
+					</div>
+				</div>
+			{% else %}
+				<div class="c-lot-timer-closed">
+					<span>{{ 'Dit lot is afgesloten'|t }}</span>
+				</div>
+			{% endif %}
+		</div>
+
+		{# ===================== ONDERBLOK: schatting / bod / formulier ===================== #}
+		<div class="c-lot-teaser__info-bottom">
+
+			{% if end_ts and server_now < end_ts %}
+				{# ----- LOT IS OPEN ----- #}
+				<h4 class="c-lot-teaser__subtitle">{{ 'Schatting'|t }}</h4>
+				{{ content.field_minimum_estimate }}
+
+				{% if logged_in %}
+					<h4 class="c-lot-teaser__subtitle">{{ 'Huidig bod'|t }}</h4>
+					{% if node.field_highest_bid.value is not empty %}
+						<span class="highest_bid">€
+							{{ content.field_highest_bid }}</span>
+					{% else %}
+						<span class="highest_bid">{{ 'Nog geen biedingen'|t }}</span>
+					{% endif %}
+
+					<div class="c-lot-bid">
+						{% if bidding_form is defined and bidding_form %}
+							{{ bidding_form }}
+						{% elseif bidding_link is defined and bidding_link %}
+							{{ bidding_link }}
+						{% else %}
+							<em>{{ 'Biedformulier is niet beschikbaar.'|t }}</em>
+						{% endif %}
+
+						{# --- Koperscommissie --- #}
+						{% set btw_val = node.field_btw_verschuldigd.value|default('0') %}
+						{% if btw_val == '0' %}
+							<div class="c-lot-cost">
+								<i>{{ 'De koperscommissie bedraagt 17% bovenop de hamerprijs.'|t }}</i>
+							</div>
+						{% elseif btw_val == '1' %}
+							<div class="c-lot-cost">
+								<i>{{ 'De koperscommissie bedraagt 14,05% bovenop de hamerprijs.'|t }}</i>
+							</div>
+						{% endif %}
+					</div>
+
+					{% if node.field_highest_bid_user.target_id == uid %}
+						<div class="highest_bidder">
+							{{ 'Je hebt momenteel het hoogste bod'|t }}
+						</div>
+					{% endif %}
+				{% else %}
+					<div class="login-message">
+						{{ 'Inloggen om te bieden'|t }}
+					</div>
+				{% endif %}
+
+			{% else %}
+				{# ----- LOT IS GESLOTEN ----- #}
+				<h4 class="c-lot-teaser__subtitle">{{ 'Resultaat'|t }}</h4>
+				{% if node.field_highest_bid.value is not empty %}
+					<span class="highest_bid">€
+						{{ content.field_highest_bid }}</span>
+				{% else %}
+					<span class="highest_bid">{{ 'Geen biedingen'|t }}</span>
+				{% endif %}
+			{% endif %}
+
+		</div>
+
+	</div>
+</article>

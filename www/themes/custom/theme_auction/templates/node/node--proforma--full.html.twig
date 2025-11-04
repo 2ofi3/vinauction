@@ -1,0 +1,164 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ *
+ * @see template_preprocess_node()
+ */
+#}
+
+{# {{ drupal_dump(uid) }}
+{{ drupal_dump(proforma_id) }}
+
+ #}
+
+{%
+set classes = [
+  'c-node',
+]
+%}
+{{ attach_library('classy/node') }}
+
+{% set enddate = auction_reference_date|render|striptags|date('d/m/Y') %}
+
+<a class="back-auction" href="/nl/node/{{ content.field_veiling[0] }}">{{ 'Back to auction'|t }}</a>
+
+<a href="{{ front_page }}" class="c-page-logo" style="text-align:center; width:100%; margin-bottom: 4rem">
+  <img src="{{ base_path ~ directory }}/img/vin-auction_logo.jpg" width="150" height="150" alt="Vin.Auction" />
+</a>
+<div class="c_proforma_user">
+  {% if user_reference_company   %}
+    <span>{{ user_reference_company }}</span>
+  {% else %}
+    <span>{{ user_reference_first_name }} {{ user_reference_last_name }}</span>
+  {% endif %}
+  <span>{{ user_reference_addresse }}</span>
+  <span>{{ user_reference_postal }} {{ user_reference_city }}</span>
+  <span class="country">{{ user_reference_country }}</span>
+</div>
+
+<div class="c_proforma_info">
+  {% if proforma_invoice is not null and proforma_invoice is not empty %}
+    <span>Invoice: {{ proforma_invoice }}</span>
+  {% else %}
+    <span>Proforma</span>
+  {% endif %}
+
+  <span>{{ 'Date'|t }}: {{ node.createdtime | date('d/m/Y') }}</span>
+  <span>{{ 'VAT number'|t }}: {{ user_reference_vat }}</span>
+  <span>{{ 'Auction'|t }}: {{ enddate }}</span>
+</div>
+
+<article{{ attributes.addClass(classes) }}>
+  <ul class="c_loten c_loten_title">
+    <li><strong>{{ 'Lot'|t }}</strong></li>
+    <li><strong>Content</strong></li>
+    <li></li>
+    <li><strong>{{ 'Hammer price'|t }}</strong></li>
+    <li><strong>{{ 'Commission %'|t }}</strong></li>
+    <li><strong>{{ 'Commission €'|t }}</strong></li>
+    <li><strong>{{ 'VAT %'|t }}</strong></li>
+    <li><strong>{{ 'VAT ammount'|t }}</strong></li>
+    <li><strong>Total</strong></li>
+  </ul>
+
+  {% for row in loten %}
+    <ul class="c_loten c_loten_data">
+      <li>{{ row.lot_nr }}</li>
+      <li>
+        {{ row.lot_wine }}
+        {% if row.lot_btw == 0 %}
+        *
+        {% endif %}
+      </li>
+      <li>{{ row.lot_size }}</li>
+      <li>{{ row.lot_highest_bid|number_format(2, ',', '.') }} €</li>
+      <li>{{ row.lot_commissie_percentage }}</li>
+      <li>{{ row.lot_commissie|number_format(2, ',', '.') }} €</li>
+      <li>
+        {% if row.lot_btw == 1 %}
+          {{ user_reference_vat_tarief }}%
+          {% else %}
+          *
+        {% endif %}
+      </li>
+      <li>
+      {% if row.lot_btw == 1 %}
+          {{ row.lot_total_btw_only|number_format(2, ',', '.')}} €
+          {% else %}
+          *
+        {% endif %}
+      </li>
+      <li>{{ row.lot_total_btw|number_format(2, ',', '.')}} €</li>
+    </ul>
+  {% endfor %}
+
+  <ul class="c_totals">
+    <li>
+      <span><strong>{{ 'Total hammer price'|t }}*: </strong></span> <span>{{ lot_total_hamerprijs|number_format(2, ',', '.') }} €</span>
+    </li>
+    <li>
+        <span><strong>{{ 'Commission'|t }}: </strong></span> <span>{{ lot_total_commissie|number_format(2, ',', '.') }} €</span>
+    </li>
+    <li>
+      <span><strong>{{ 'VAT / BTW amount over VAT lots'|t }}: </strong></span> <span>{{ lot_total_btw|number_format(2, ',', '.') }} €</span>
+    </li>
+    {% if content.field_insurance[0] %}
+      <li>
+        <span><strong>{{ 'Insurance**'|t }}: </strong></span> <span>{{ content.field_insurance }} €</span>
+      </li>
+    {% endif %}
+    {% if content.field_transport_cost[0] %}
+      <li>
+        <span><strong>{{ 'Shipment cost'|t }}: </strong></span> <span>{{ content.field_transport_cost }} €</span>
+      </li>
+    {% endif %}
+    <li>
+      <h3><strong>Total: </strong></span> <span>{{ lot_total_all|number_format(2, ',', '.') }} € </h3>
+    </li>
+    <br />
+
+    {% if content.field_number_of_packages[0] %}
+      <li>
+        <span><strong>{{ 'Number of packages send by DHL express'|t }}: </strong></span> <span>{{ content.field_number_of_packages }}</span>
+      </li>
+    {% endif %}
+    {% if content.field_weight[0] %}
+      <li>
+        <span><strong>{{ 'Total weight'|t }}: </strong></span> <span>{{ content.field_weight }}</span>
+      </li>
+    {% endif %}
+
+  </ul>
+  <div class="c_bottom-top">
+  <br />
+    <p>Payable on account number: <strong>BE66 6451 0371 3243</strong></p>
+    {% if user_reference_intracommunautair == 0 and user_reference_export == 0 %}
+      <p>*Levering onderworpen aan de bijzondere regeling van belastingheffing over de winstmarge. <br/>
+      BTW / VAT niet aftrekbaar.</p>
+    {% endif %}
+    {% if user_reference_intracommunautair == 1 %}
+      <p><strong>*Intracommunautaire levering</strong><br/>
+        Vervoer door de verkoper van België naar land van bestemming<br/>
+        Vrijstelling van BTW - Artikel 39bis, 1e lid, 1° W. BTW - artikel 138, lid 1 Richtlijn 2006/112<br/>
+        Exempté de TVA - Art. 39bis, 1er alinéa, 1° CTVA / exonéré - Article 138, § 1 Directive 2006/112<br/>
+        Exemption VAT- Art. 39bis, 1st paragraph, 1°  Belgian VAT-Code - Article 138, § 1 Directive 2006/112</p>
+    {% endif %}
+    {% if user_reference_export == 1 %}
+      <p><strong>*Export levering</strong><br/>
+        Vervoer door Vin.auction ( Angu bvba ) van België naar het land van bestemming<br/>
+        Vrijstelling van BTW - Artikel 39, § 1, 1° W. BTW - artikel 146, lid 1,a Richtlijn 2006/112<br/>
+        Exempté de TVA - Art. 39, § 1,  1° CTVA / exonéré - Article 146, § 1, a Directive 2006/112<br/>
+        Exemption VAT- Art. 39, § 1,  1° Belgian VAT-Code - Article 146, § 1 a Directive 2006/112</p>
+    {% endif %}
+    {% if content.field_transport_cost[0] %}
+     <p>{{ '**1% of the full amount. 100% coverage in case of damage, lost or theft'|t }}</p>
+    {% endif %}
+  </div>
+  <div class="c_bottom">
+    <p>Vin.auction ° ANGU bvba ° Prinsdaal 103 ° B-9420 Bambrugge ° Belgium ( Europe )<br/>
+    T +32(0)473.32.10.08 ° F +32(0)53.70.75.25 ° BTW BE 0478.669.363 ° RPR Dendermonde<br/>
+    info@vin.auction - https://vin.auction<br/>
+    BANK VAN BREDA - IBAN BE66 6451 0371 3243 - SWIFT JVBABE22<br/>
+  </div>
+</article>

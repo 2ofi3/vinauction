@@ -1,0 +1,202 @@
+<?php
+
+/**
+ * @file
+ * Contains module_auction_view.module.
+ */
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\Entity\Node;
+use Drupal\Core\Datetime\DrupalDateTime;
+
+/**
+ * Implements hook_help().
+ */
+function module_auction_view_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the module_auction_view module.
+    case 'help.page.module_auction_view':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Custom functions in auction overview') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function module_auction_view_theme() {
+  return [
+    'module_auction_view' => [
+      'render element' => 'children',
+    ],
+  ];
+}
+
+function module_auction_view_node_view_alter(array &$build, Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display) {
+  if ($entity->bundle() == 'lot') {
+    $build['#cache']['max-age'] = 0;
+    \Drupal::service('page_cache_kill_switch')->trigger();
+  }
+}
+
+
+/**
+ * Implements hook_node_presave().
+ */
+function module_auction_view_node_presave(\Drupal\Core\Entity\EntityInterface $node) {
+
+  if ($node->bundle() == "veiling") {
+  
+    $proforma =  $node->get('field_proforma_aanmaken')->value;
+    
+    if ($proforma == 1){
+      $nid = $node->id();
+      $requested_time = \Drupal::time()->getRequestTime();
+      
+      // GET LOTEN
+      $ids_lot = \Drupal::entityQuery('node')
+        ->condition('type','lot')
+        ->condition('field_auction_reference', $nid)
+        ->sort('field_lot_nr', 'ASC')
+        //->range(0, 30)
+        ->execute();
+  
+      $nodes_lot = \Drupal\node\Entity\Node::loadMultiple($ids_lot);
+      
+      $used_users = array();
+      foreach ($nodes_lot as $node_lot) {
+        $user_reference_id = $node_lot->get('field_highest_bid_user')->target_id;
+  
+        if (!in_array($user_reference_id, $used_users )){
+          $new_result[] = $node_lot;
+          $used_users[] = $user_reference_id;
+        }
+      }
+  
+      $nodes_lot = $new_result;
+      
+      foreach ($new_result as $result) {
+        $year = date("Y");
+        $user_reference_id = $result->get('field_highest_bid_user')->target_id;
+        
+        if ($user_reference_id > 0) {
+          //The article is a machine name of a bundle of a content type.
+          $node_lot = Node::create(array(
+            'type' => 'proforma',
+            'title' => 'Proforma: '.$year.'-'.$nid.'-'.$user_reference_id,
+            'langcode' => 'nl',
+            'uid' => '1',
+            'status' => 1,
+            'created' => $requested_time,
+            'changed' => $requested_time,
+            'field_bieder' => $user_reference_id,
+            'field_veiling' => $nid,
+          ));
+     
+          $node_lot->save();
+        }
+      }
+      
+      \Drupal::messenger()->addMessage('Proforma aangemaakt'. $message);
+    }
+  }
+  
+  if ($node->bundle() == "lot") {
+    $auction_reference = $node->get('field_auction_reference')->getValue();
+    $node_lot = $node->get('field_lot_nr')->value;
+    $node_lot = ($node_lot == '1') ? '0' : $node_lot - 1;
+    
+    $proforma = $node->get('field_auction_reference')->referencedEntities()[0]->field_proforma_aanmaken->value;
+
+    if (!empty($auction_reference[0]['target_id'])) {
+      $auction_node = \Drupal\node\Entity\Node::load($auction_reference[0]['target_id']);
+
+      if ($auction_node) {
+        // Date Now
+        $date_now = new DrupalDateTime('now');
+        
+        // Auction start/end time
+        $starttime_auction = new DrupalDateTime($auction_node->get('field_auction_date')->value);
+        $endtime_auction = new DrupalDateTime($auction_node->get('field_einddatum')->value);
+
+        // Lot end time
+        $minutesToAdd = $node_lot;
+        $secondsToAdd = (60 * $minutesToAdd) / 3;
+        $starttime_lot = $starttime_auction;
+        $endtime_lot = $endtime_auction->modify("+{$secondsToAdd} seconds");
+
+        // Prepare for field value
+        $date_formatter = \Drupal::service('date.formatter');
+        $date = $date_formatter->format($endtime_lot->getTimestamp(), 'custom', 'Y-m-d\TH:i:s');
+
+        // Set endtime on lot
+        $node->set('field_einddatum', $date);
+      }
+    }
+  }
+ 
+  if ($node->bundle() == "proforma") {
+    $year = date("Y");
+    $auction_reference_id = $node->get('field_veiling')->first()->getValue()['target_id'];
+    $user_reference_id = $node->get('field_bieder')->first()->getValue()['target_id'];
+    $invoice_number = $node->field_invoice_number->value;
+    
+    if (isset($invoice_number)) {
+      // Setting the title with the value of auction & user
+      $node->setTitle('Invoice: '.$invoice_number);
+    } else {
+      // Setting the title with the value of auction & user
+      $node->setTitle('Proforma: '.$year.'-'.$auction_reference_id.'-'.$user_reference_id);
+    }
+  } 
+}
+
+/**
+ * Implements hook_node_postsave().
+ */
+function module_auction_view_node_update(\Drupal\Core\Entity\EntityInterface $node) {
+  if ($node->bundle() == "veiling") {
+  
+    $proforma = $node->get('field_proforma_aanmaken')->value;
+    $update = $node->get('field_loten_updaten')->value;
+    $off = '0';
+    
+    if ($proforma == 1){
+      $node->set('field_proforma_aanmaken', $off);
+      $node->save();
+    } 
+    
+    if ($update == 1){
+      $nid = $node->id();
+      
+      $ids_lot = \Drupal::entityQuery('node')
+        ->condition('type','lot')
+        ->condition('field_auction_reference', $nid)
+        ->execute();
+  
+      $nodes_lot = \Drupal\node\Entity\Node::loadMultiple($ids_lot);
+  
+      foreach ($nodes_lot as $node_lot) {
+        if ($node->isPublished()) {
+          $node_lot->setPublished();
+          $message = " and set to Published.";
+        }
+        else {
+          $node_lot->setUnpublished();
+          $message = " and set to Unpublished.";
+        }
+        // Save Lot node to update field_einddatum on Lot node (which is performed on node_presave)
+        $node_lot->save();
+      }
+      
+      $node->set('field_loten_updaten', $off);
+      $node->save();
+  
+      \Drupal::messenger()->addMessage('Loten updated with new enddate'. $message);
+    }
+  }
+}
+
